@@ -6,7 +6,6 @@ import datetime
 import locale
 from collections import namedtuple
 
-# TODO: Maybe the comparison_output_format should be moved out of this object
 LogType = namedtuple(
     "LogType",
     [
@@ -15,7 +14,6 @@ LogType = namedtuple(
         "date_format",
         "date_locale",
         "examples",
-        "comparison_output_format",
     ],
 )
 
@@ -50,7 +48,6 @@ ULOGCAT_LOG_TYPE = LogType(
     date_format=ULOGCAT_DATE_FORMAT,
     date_locale=None,
     examples=ULOGCAT_EXAMPLES,
-    comparison_output_format=ULOGCAT_OUTPUT_FORMAT,
 )
 
 # ULOGCAT SHORT FORMAT
@@ -78,7 +75,6 @@ ULOGCAT_SHORT_LOG_TYPE = LogType(
     date_format=None,
     date_locale=None,
     examples=ULOGCAT_SHORT_EXAMPLES,
-    comparison_output_format=ULOGCAT_SHORT_OUTPUT_FORMAT,
 )
 
 # LOGCAT FORMAT
@@ -109,7 +105,6 @@ LOGCAT_LOG_TYPE = LogType(
     date_format=LOGCAT_DATE_FORMAT,
     date_locale=None,
     examples=LOGCAT_EXAMPLES,
-    comparison_output_format=LOGCAT_OUTPUT_FORMAT,
 )
 
 # DMESG FORMAT
@@ -162,7 +157,6 @@ DMESG_LOG_TYPE = LogType(
     date_format=DMESG_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 DMESG_HUMANTIMESTAMP_LOG_TYPE = LogType(
@@ -171,7 +165,6 @@ DMESG_HUMANTIMESTAMP_LOG_TYPE = LogType(
     date_format=DMESG_HUMANTIMESTAMP_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_HUMANTIMESTAMP_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 DMESG_RAW_LOG_TYPE = LogType(
@@ -180,7 +173,6 @@ DMESG_RAW_LOG_TYPE = LogType(
     date_format=DMESG_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_RAW_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 
@@ -210,7 +202,6 @@ JENKINS_LOG_TYPE = LogType(
     date_format=JENKINS_DATE_FORMAT,
     date_locale=None,
     examples=JENKINS_EXAMPLES,
-    comparison_output_format=JENKINS_OUTPUT_FORMAT,
 )
 
 # JOURNALCTL FORMAT
@@ -244,7 +235,6 @@ JOURNALCTL_LOG_TYPE = LogType(
     date_format=JOURNALCTL_DATE_FORMAT,
     date_locale="fr_FR.UTF-8",
     examples=JOURNALCTL_EXAMPLES,
-    comparison_output_format=JOURNALCTL_OUTPUT_FORMAT,
 )
 
 # SYSLOG FORMAT
@@ -276,7 +266,6 @@ SYSLOG_LOG_TYPE = LogType(
     date_format=SYSLOG_DATE_FORMAT,
     date_locale=None,
     examples=SYSLOG_EXAMPLES,
-    comparison_output_format=SYSLOG_OUTPUT_FORMAT,
 )
 
 
@@ -301,7 +290,6 @@ XXX_LOG_TYPE = LogType(
     date_format=XXX_DATE_FORMAT,
     date_locale=None,
     examples=XXX_EXAMPLES,
-    comparison_output_format=XXX_OUTPUT_FORMAT,
 )
 
 
