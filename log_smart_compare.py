@@ -14,20 +14,29 @@ import subprocess
 
 from log_types import LOG_CONFIGS
 
+
 def clean_content(s):
-    hex_ign_case = '[0-9a-fA-F]'
-    hex_upp_case = '[0-9A-F]'
-    hex_low_case = '[0-9a-f]'
+    hex_ign_case = "[0-9a-fA-F]"
+    hex_upp_case = "[0-9A-F]"
+    hex_low_case = "[0-9a-f]"
     # Replace hex strings (like "0xf0c371cdfcaca")
-    s = re.sub('0x{0}+'.format(hex_ign_case), '<hex>', s)
+    s = re.sub("0x{0}+".format(hex_ign_case), "<hex>", s)
     # Replace MAC/Bluetooth addresses (like "F0:C3:71:CD:CA:CA" or "72:5a:7d:6c:26:19")
-    s = re.sub('{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}'.format(hex_ign_case), '<mac>', s)
+    s = re.sub(
+        "{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}:{0}{{2}}".format(hex_ign_case),
+        "<mac>",
+        s,
+    )
     # Replace UUID (like "22A0B758-3FC3-480F-87A0-AECCA283CACA")
-    s = re.sub('{0}{{8}}-{0}{{4}}-{0}{{4}}-{0}{{4}}-{0}{{12}}'.format(hex_upp_case), '<uuid>', s)
+    s = re.sub(
+        "{0}{{8}}-{0}{{4}}-{0}{{4}}-{0}{{4}}-{0}{{12}}".format(hex_upp_case),
+        "<uuid>",
+        s,
+    )
     # Clean date (like "2008-01-01 12:27:32.963591 AM")
-    s = re.sub('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+', '<date>', s)
+    s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
     # Replace hashcodes (like "@ce7ed73")
-    s = re.sub('@{0}+'.format(hex_low_case), '<hash>', s)
+    s = re.sub("@{0}+".format(hex_low_case), "<hash>", s)
     return s
 
 
@@ -48,7 +57,7 @@ def extract_data(f, log_type):
             else:
                 d = m.groupdict()
                 try:
-                    d['clean_content'] = clean_content(d['content'])
+                    d["clean_content"] = clean_content(d["content"])
                 except KeyError:
                     pass
                 out_line = out_format.format(**d)
@@ -57,7 +66,11 @@ def extract_data(f, log_type):
                 clean_lst.append(out_line)
             original_lst.append(line)
     if no_match:
-        log = "%s lines from %s did not match (out of %s):" % (len(no_match), f.name, len(original_lst))
+        log = "%s lines from %s did not match (out of %s):" % (
+            len(no_match),
+            f.name,
+            len(original_lst),
+        )
         print(log)
         for line in no_match:
             print("  '" + line + "'")
@@ -128,7 +141,8 @@ if __name__ == "__main__":
         help="Keys used to group lines in folders. Unavailable values are ignored. Values available depend on the format used: ALL for all formats, then %s. Default value: %s."
         % (
             ";".join(
-                " for %s: %s" % (log_type.name, ", ".join(log_type.regex.groupindex.keys()))
+                " for %s: %s"
+                % (log_type.name, ", ".join(log_type.regex.groupindex.keys()))
                 for log_type in LOG_CONFIGS.values()
             ),
             default_group_keys,

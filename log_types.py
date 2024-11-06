@@ -7,7 +7,17 @@ import locale
 from collections import namedtuple
 
 # TODO: Maybe the comparison_output_format should be moved out of this object
-LogType = namedtuple('LogType', ['name', 'regex', 'date_format', 'date_locale', 'examples', 'comparison_output_format'])
+LogType = namedtuple(
+    "LogType",
+    [
+        "name",
+        "regex",
+        "date_format",
+        "date_locale",
+        "examples",
+        "comparison_output_format",
+    ],
+)
 
 # ULOGCAT FORMAT
 #########################################
@@ -40,7 +50,7 @@ ULOGCAT_LOG_TYPE = LogType(
     date_format=ULOGCAT_DATE_FORMAT,
     date_locale=None,
     examples=ULOGCAT_EXAMPLES,
-    comparison_output_format=ULOGCAT_OUTPUT_FORMAT
+    comparison_output_format=ULOGCAT_OUTPUT_FORMAT,
 )
 
 # ULOGCAT SHORT FORMAT
@@ -59,9 +69,7 @@ ULOGCAT_SHORT_RE = re.compile(
 )
 
 # Output format for a short ulogcat line
-ULOGCAT_SHORT_OUTPUT_FORMAT = (
-    "{level} {tag} ({processname}): {clean_content}"
-)
+ULOGCAT_SHORT_OUTPUT_FORMAT = "{level} {tag} ({processname}): {clean_content}"
 
 # Tuple with all information
 ULOGCAT_SHORT_LOG_TYPE = LogType(
@@ -70,7 +78,7 @@ ULOGCAT_SHORT_LOG_TYPE = LogType(
     date_format=None,
     date_locale=None,
     examples=ULOGCAT_SHORT_EXAMPLES,
-    comparison_output_format=ULOGCAT_SHORT_OUTPUT_FORMAT
+    comparison_output_format=ULOGCAT_SHORT_OUTPUT_FORMAT,
 )
 
 # LOGCAT FORMAT
@@ -101,7 +109,7 @@ LOGCAT_LOG_TYPE = LogType(
     date_format=LOGCAT_DATE_FORMAT,
     date_locale=None,
     examples=LOGCAT_EXAMPLES,
-    comparison_output_format=LOGCAT_OUTPUT_FORMAT
+    comparison_output_format=LOGCAT_OUTPUT_FORMAT,
 )
 
 # DMESG FORMAT
@@ -118,7 +126,7 @@ DMESG_EXAMPLES = [
 ]
 # or
 DMESG_HUMANTIMESTAMP_EXAMPLES = [
-# - dmesg -T
+    # - dmesg -T
     "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_print_event_data : event_type (5), ifidx: 0 bssidx: 0 status:0 reason:7",
     "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] Mode AP/GO. Event:5 status:0 reason:7",
     "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] del sta event for 4e:37:29:ae:b2:0d",
@@ -134,7 +142,9 @@ DMESG_RAW_EXAMPLES = [
 ]
 
 # Regexp for a dmesg line
-DMESG_RE = re.compile(r"^(<\d+>)?\[(?P<date>[^]]+)\] (?P<processid>[^:]*:)?(?P<content>.*)$")
+DMESG_RE = re.compile(
+    r"^(<\d+>)?\[(?P<date>[^]]+)\] (?P<processid>[^:]*:)?(?P<content>.*)$"
+)
 
 # Date format for an dmesg date
 DMESG_DATE_FORMAT = None
@@ -152,7 +162,7 @@ DMESG_LOG_TYPE = LogType(
     date_format=DMESG_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT
+    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 DMESG_HUMANTIMESTAMP_LOG_TYPE = LogType(
@@ -161,7 +171,7 @@ DMESG_HUMANTIMESTAMP_LOG_TYPE = LogType(
     date_format=DMESG_HUMANTIMESTAMP_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_HUMANTIMESTAMP_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT
+    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 DMESG_RAW_LOG_TYPE = LogType(
@@ -170,7 +180,7 @@ DMESG_RAW_LOG_TYPE = LogType(
     date_format=DMESG_DATE_FORMAT,
     date_locale=None,
     examples=DMESG_RAW_EXAMPLES,
-    comparison_output_format=DMESG_OUTPUT_FORMAT
+    comparison_output_format=DMESG_OUTPUT_FORMAT,
 )
 
 
@@ -183,7 +193,9 @@ JENKINS_EXAMPLES = [
 ]
 
 # Regexp for a Jenkins line
-JENKINS_RE = re.compile(r"^\[(?P<date>[0-9TZ:.-]*)\](?P<progress> \[\s*\d+% \d+/\d+])? ?(?P<content>.*)$")
+JENKINS_RE = re.compile(
+    r"^\[(?P<date>[0-9TZ:.-]*)\](?P<progress> \[\s*\d+% \d+/\d+])? ?(?P<content>.*)$"
+)
 
 # Date format for an Jenkins date
 JENKINS_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -198,7 +210,7 @@ JENKINS_LOG_TYPE = LogType(
     date_format=JENKINS_DATE_FORMAT,
     date_locale=None,
     examples=JENKINS_EXAMPLES,
-    comparison_output_format=JENKINS_OUTPUT_FORMAT
+    comparison_output_format=JENKINS_OUTPUT_FORMAT,
 )
 
 # JOURNALCTL FORMAT
@@ -206,16 +218,18 @@ JENKINS_LOG_TYPE = LogType(
 #########################################
 # Examples:
 JOURNALCTL_EXAMPLES = [
-   "juil. 26 16:21:56 hostname.ls.ege.ds tracker-store[2124436]: OK",
-   "juil. 26 16:21:56 hostname.ls.ege.ds systemd[4007]: tracker-store.service: Succeeded.",
-   "juil. 26 16:23:30 hostname.ls.ege.ds gnome-shell[4356]: Removing a network device that was not added",
-   "nov. 06 14:13:43 hostname.ls.ege.ds systemd[4676]: Started Tracker metadata database store and lookup manager.",
-   "nov. 06 14:14:13 hostname.ls.ege.ds tracker-store[762255]: OK",
-   "nov. 06 14:14:13 hostname.ls.ege.ds systemd[4676]: tracker-store.service: Succeeded.",
+    "juil. 26 16:21:56 hostname.ls.ege.ds tracker-store[2124436]: OK",
+    "juil. 26 16:21:56 hostname.ls.ege.ds systemd[4007]: tracker-store.service: Succeeded.",
+    "juil. 26 16:23:30 hostname.ls.ege.ds gnome-shell[4356]: Removing a network device that was not added",
+    "nov. 06 14:13:43 hostname.ls.ege.ds systemd[4676]: Started Tracker metadata database store and lookup manager.",
+    "nov. 06 14:14:13 hostname.ls.ege.ds tracker-store[762255]: OK",
+    "nov. 06 14:14:13 hostname.ls.ege.ds systemd[4676]: tracker-store.service: Succeeded.",
 ]
 
 # Regexp for a journalctl line
-JOURNALCTL_RE = re.compile(r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$")
+JOURNALCTL_RE = re.compile(
+    r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$"
+)
 
 # Date format for an journalctl date
 JOURNALCTL_DATE_FORMAT = "%b %d %H:%M:%S"
@@ -228,9 +242,9 @@ JOURNALCTL_LOG_TYPE = LogType(
     name="journalctl",
     regex=JOURNALCTL_RE,
     date_format=JOURNALCTL_DATE_FORMAT,
-    date_locale='fr_FR.UTF-8',
+    date_locale="fr_FR.UTF-8",
     examples=JOURNALCTL_EXAMPLES,
-    comparison_output_format=JOURNALCTL_OUTPUT_FORMAT
+    comparison_output_format=JOURNALCTL_OUTPUT_FORMAT,
 )
 
 # SYSLOG FORMAT
@@ -238,14 +252,16 @@ JOURNALCTL_LOG_TYPE = LogType(
 # Examples:
 # sudo cat /var/log/syslog
 SYSLOG_EXAMPLES = [
-#     "Nov  6 17:10:50 hostname cr-edr-activeprobe 4243 INFO 2024-11-06_16:10:48 ServerPublishBufferSink.cpp.o:211 1 items, PublishService-ServerPublishBufferSink, 168 bytes, Seq 2752",
+    #     "Nov  6 17:10:50 hostname cr-edr-activeprobe 4243 INFO 2024-11-06_16:10:48 ServerPublishBufferSink.cpp.o:211 1 items, PublishService-ServerPublishBufferSink, 168 bytes, Seq 2752",
     "Nov  6 17:10:53 hostname systemd[4676]: tracker-extract.service: Succeeded.",
     "Nov  6 17:10:53 hostname systemd[1]: Starting Refresh fwupd metadata and update motd...",
     "Nov  6 17:10:53 hostname systemd[1]: fwupd-refresh.service: Succeeded.",
 ]
 
 # Regexp for a syslog line
-SYSLOG_RE = re.compile(r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$")
+SYSLOG_RE = re.compile(
+    r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$"
+)
 
 # Date format for an syslog date
 SYSLOG_DATE_FORMAT = "%b %d %H:%M:%S"
@@ -260,21 +276,20 @@ SYSLOG_LOG_TYPE = LogType(
     date_format=SYSLOG_DATE_FORMAT,
     date_locale=None,
     examples=SYSLOG_EXAMPLES,
-    comparison_output_format=SYSLOG_OUTPUT_FORMAT
+    comparison_output_format=SYSLOG_OUTPUT_FORMAT,
 )
 
 
 # XXX FORMAT
 #########################################
 # Examples:
-XXX_EXAMPLES = [
-]
+XXX_EXAMPLES = []
 
 # Regexp for a xxx line
 XXX_RE = re.compile(r"^.*$")
 
 # Date format for an xxx date
-XXX_DATE_FORMAT = None 
+XXX_DATE_FORMAT = None
 
 # Output format for a xxx line
 XXX_OUTPUT_FORMAT = "DATE {content}"
@@ -286,7 +301,7 @@ XXX_LOG_TYPE = LogType(
     date_format=XXX_DATE_FORMAT,
     date_locale=None,
     examples=XXX_EXAMPLES,
-    comparison_output_format=XXX_OUTPUT_FORMAT
+    comparison_output_format=XXX_OUTPUT_FORMAT,
 )
 
 
@@ -308,16 +323,16 @@ LOG_TYPES = [
 #########################################
 
 # Mapping from name of the log format to log information
-LOG_CONFIGS = {
-    log_type.name: log_type for log_type in LOG_TYPES
-}
+LOG_CONFIGS = {log_type.name: log_type for log_type in LOG_TYPES}
 
 
 # TESTS
 #########################################
 def test_log_type_for_examples(log_type):
     print(log_type.name)
-    log_re, date_format, local = log_type.regex, log_type.date_format, log_type.date_locale
+    log_re = log_type.regex
+    date_format = log_type.date_format
+    local = log_type.date_locale
     # Save original locale
     prev_locale = locale.setlocale(locale.LC_ALL)
     # Use relevant locale
@@ -327,7 +342,7 @@ def test_log_type_for_examples(log_type):
         m = re.match(log_re, s)
         assert m
         match_dict = m.groupdict()
-        date_str = match_dict.get('date')
+        date_str = match_dict.get("date")
         if date_format is not None:
             date_obj = datetime.datetime.strptime(date_str, date_format)
             date_str2 = date_obj.strftime(date_format)
