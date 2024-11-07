@@ -83,6 +83,7 @@ class DmesgDefaultLogType(LogType):
         "[43288.264615] usb 1-4: USB disconnect, device number 27",
         "[    4.849161] hub 3-0:1.0: [INFO][USB] 1 port detected",
         "[   13.118810] p2p is supported",
+        "[15537.298409] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=192.168.1.30 DST=192.168.1.45 LEN=522 TOS=0x00 PREC=0x00 TTL=64",
     ]
     regex = DMESG_RE
     date_format = None
@@ -97,6 +98,7 @@ class DmesgHumanTimestampsLogType(LogType):
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_print_event_data : event_type (5), ifidx: 0 bssidx: 0 status:0 reason:7",
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] Mode AP/GO. Event:5 status:0 reason:7",
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] del sta event for 4e:37:29:ae:b2:0d",
+#        "[jeu. nov.  7 13:16:43 2024] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=19",
     ]
     regex = DMESG_RE
     date_format = "%a %b %d %H:%M:%S %Y"
@@ -113,6 +115,7 @@ class DmesgRawLogType(LogType):
         "<4>[  218.845061] ETHER_TYPE_802_1X[wlan_oem0] [RX]: EAPOL Packet, 4-way handshake, M2",
         "<4>[  218.846470] ETHER_TYPE_802_1X[wlan_oem0] [TX]: EAPOL Packet, 4-way handshake, M3 TX_PKTHASH:0x0 TX_PKT_FATE:N/A",
         "<4>[  218.849981] ETHER_TYPE_802_1X[wlan_oem0] [RX]: EAPOL Packet, 4-way handshake, M4",
+        "<4>[15779.293768] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=192.168.1.30",
     ]
     regex = DMESG_RE
     date_format = None
@@ -160,14 +163,16 @@ class SysLogLogType(LogType):
 
     name = "syslog"
     examples = [
-        #     "Nov  6 17:10:50 hostname cr-edr-activeprobe 4243 INFO 2024-11-06_16:10:48 ServerPublishBufferSink.cpp.o:211 1 items, PublishService-ServerPublishBufferSink, 168 bytes, Seq 2752",
+        "Nov  6 17:10:50 hostname cr-edr-activeprobe 4243 INFO 2024-11-06_16:10:48 ServerPublishBufferSink.cpp.o:211 1 items, PublishService-ServerPublishBufferSink, 168 bytes, Seq 2752",
+        "Nov  7 09:06:15 hostname sudo Nov  7 09:06:12 2024 : user : HOST=HOSTNAME : TTY=tty2 ;",
+        "Nov  7 09:06:15 hostname kernel: [  752.923011] Lockdown: systemd-logind: hibernation is restricted;7",
         "Nov  6 17:10:53 hostname systemd[4676]: tracker-extract.service: Succeeded.",
         "Nov  6 17:10:53 hostname systemd[1]: Starting Refresh fwupd metadata and update motd...",
         "Nov  6 17:10:53 hostname systemd[1]: fwupd-refresh.service: Succeeded.",
     ]
 
     regex = re.compile(
-        r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$"
+        r"^(?P<date>[^ ]* +\d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<content>.*)$"
     )
     date_format = "%b %d %H:%M:%S"
     date_locale = None
