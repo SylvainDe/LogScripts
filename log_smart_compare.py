@@ -12,31 +12,41 @@ import tempfile
 import os
 import subprocess
 
-from log_types import LOG_TYPES
+import log_types
+from log_types import (
+    LOG_CONFIGS,
+    UlogcatLongLogType,
+    UlogcatShortLogType,
+    LogcatLogType,
+    DmesgDefaultLogType,
+    DmesgHumanTimestampsLogType,
+    DmesgRawLogType,
+    JenkinsLogType,
+    JournalCtlLogType,
+    SysLogLogType,
+    DmesgDefaultLogType,
+    DmesgHumanTimestampsLogType,
+    DmesgRawLogType,
+    JenkinsLogType,
+    JournalCtlLogType,
+    SysLogLogType,
+)
 
-OUTPUT_FORMATS = {
-    # Output format for an ulogcat line
-    "ulogcat": "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}",
-    # Output format for a short ulogcat line
-    "ulogcat_short": "{level} {tag} ({processname}): {clean_content}",
-    # Output format for a logcat line
-    "logcat": "DATE PID TID {level} {tag} {clean_content}",
-    # Output format for a dmesg line
-    "dmesg": "DATE {processid} {clean_content}",
-    "dmesg_humantime": "DATE {processid} {clean_content}",
-    "dmesg_raw": "DATE {processid} {clean_content}",
-    # Output format for a Jenkins line
-    "jenkins": "DATE {content}",
-    # Output format for a journalctl line
-    "journalctl": "DATE {hostname} {processname} {processid} {clean_content}",
-    # Output format for a syslog line
-    "syslog": "DATE {hostname} {processname} {clean_content}",
-}
 
-# Mapping from name of the log format to log information
-LOG_CONFIGS = {
-    log_type.name: (log_type, OUTPUT_FORMATS[log_type.name]) for log_type in LOG_TYPES
-}
+# Add information about the output format to the log types
+UlogcatLongLogType.output_format = (
+    "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}"
+)
+UlogcatShortLogType.output_format = ("{level} {tag} ({processname}): {clean_content}",)
+LogcatLogType.output_format = ("DATE PID TID {level} {tag} {clean_content}",)
+DmesgDefaultLogType.output_format = ("DATE {processid} {clean_content}",)
+DmesgHumanTimestampsLogType.output_format = ("DATE {processid} {clean_content}",)
+DmesgRawLogType.output_format = ("DATE {processid} {clean_content}",)
+JenkinsLogType.output_format = ("DATE {content}",)
+JournalCtlLogType.output_format = (
+    "DATE {hostname} {processname} {processid} {clean_content}",
+)
+SysLogLogType.output_format = ("DATE {hostname} {processname} {clean_content}",)
 
 
 def clean_content(s):
@@ -64,10 +74,10 @@ def clean_content(s):
     return s
 
 
-def extract_data(f, log_config):
+def extract_data(f, log_type):
     """Extract relevant data from file - return a dictionnary."""
-    log_type, out_format = log_config
     log_re = log_type.regex
+    out_format = log_type.output_format
     bigdict = dict()
     dict_all = bigdict.setdefault("ALL", dict())
     clean_lst = dict_all.setdefault("clean", [])
@@ -103,10 +113,10 @@ def extract_data(f, log_config):
     return bigdict
 
 
-def store_relevant_data_in_a_tmp_folder(f, log_config, group_keys):
+def store_relevant_data_in_a_tmp_folder(f, log_type, group_keys):
     """Store relevant data from file provided into a tmp folder."""
     # Extract relevant data from file
-    bigdict = extract_data(f, log_config)
+    bigdict = extract_data(f, log_type)
     # Store data in multiple files in a temporary folder
     tmpdir = tempfile.mkdtemp()
     print("%s analysed in %s" % (f.name, tmpdir))
@@ -123,11 +133,11 @@ def store_relevant_data_in_a_tmp_folder(f, log_config, group_keys):
     return tmpdir
 
 
-def compare_files(files, log_config, group_keys, difftool):
+def compare_files(files, log_type, group_keys, difftool):
     """Compare files by storing relevant data into a file hierarchy compared by a dedicated tool."""
     # Store relevant data in /tmp folders
     tmpdirs = [
-        store_relevant_data_in_a_tmp_folder(f, log_config, group_keys) for f in files
+        store_relevant_data_in_a_tmp_folder(f, log_type, group_keys) for f in files
     ]
 
     # Compare final directories in /tmp
@@ -168,7 +178,7 @@ if __name__ == "__main__":
             ";".join(
                 " for %s: %s"
                 % (log_type.name, ", ".join(log_type.regex.groupindex.keys()))
-                for log_type in LOG_TYPES
+                for log_type in LOG_CONFIGS.values()
             ),
             default_group_keys,
         ),
@@ -177,7 +187,7 @@ if __name__ == "__main__":
     # Get arguments
     args = parser.parse_args()
     group_keys = default_group_keys if args.key is None else args.key
-    log_config = LOG_CONFIGS[args.format]
+    log_type = LOG_CONFIGS[args.format]
 
     # Perform comparison
-    compare_files(args.files, log_config, group_keys, args.difftool)
+    compare_files(args.files, log_type, group_keys, args.difftool)
