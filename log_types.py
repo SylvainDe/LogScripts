@@ -36,11 +36,6 @@ ULOGCAT_RE = re.compile(
 # Date format for an ulogcat date
 ULOGCAT_DATE_FORMAT = "%m-%d %H:%M:%S.%f"
 
-# Output format for an ulogcat line
-ULOGCAT_OUTPUT_FORMAT = (
-    "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}"
-)
-
 # Tuple with all information
 ULOGCAT_LOG_TYPE = LogType(
     name="ulogcat",
@@ -64,9 +59,6 @@ ULOGCAT_SHORT_EXAMPLES = [
 ULOGCAT_SHORT_RE = re.compile(
     r"^(?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>[^)]*)\)\s*: ?(?P<content>.*)$"
 )
-
-# Output format for a short ulogcat line
-ULOGCAT_SHORT_OUTPUT_FORMAT = "{level} {tag} ({processname}): {clean_content}"
 
 # Tuple with all information
 ULOGCAT_SHORT_LOG_TYPE = LogType(
@@ -94,9 +86,6 @@ LOGCAT_RE = re.compile(
 
 # Date format for an logcat date
 LOGCAT_DATE_FORMAT = "%m-%d %H:%M:%S.%f"
-
-# Output format for a logcat line
-LOGCAT_OUTPUT_FORMAT = "DATE PID TID {level} {tag} {clean_content}"
 
 # Tuple with all information
 LOGCAT_LOG_TYPE = LogType(
@@ -147,9 +136,6 @@ DMESG_DATE_FORMAT = None
 # Date format for an dmesg with human timestamp date
 DMESG_HUMANTIMESTAMP_DATE_FORMAT = "%a %b %d %H:%M:%S %Y"
 
-# Output format for a dmesg line
-DMESG_OUTPUT_FORMAT = "DATE {processid} {content}"
-
 # Tuples with all information
 DMESG_LOG_TYPE = LogType(
     name="dmesg",
@@ -192,9 +178,6 @@ JENKINS_RE = re.compile(
 # Date format for an Jenkins date
 JENKINS_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-# Output format for a Jenkins line
-JENKINS_OUTPUT_FORMAT = "DATE {content}"
-
 # Tuple with all information
 JENKINS_LOG_TYPE = LogType(
     name="jenkins",
@@ -225,9 +208,6 @@ JOURNALCTL_RE = re.compile(
 # Date format for an journalctl date
 JOURNALCTL_DATE_FORMAT = "%b %d %H:%M:%S"
 
-# Output format for a journalctl line
-JOURNALCTL_OUTPUT_FORMAT = "DATE {content}"
-
 # Tuple with all information
 JOURNALCTL_LOG_TYPE = LogType(
     name="journalctl",
@@ -256,9 +236,6 @@ SYSLOG_RE = re.compile(
 # Date format for an syslog date
 SYSLOG_DATE_FORMAT = "%b %d %H:%M:%S"
 
-# Output format for a syslog line
-SYSLOG_OUTPUT_FORMAT = "DATE {content}"
-
 # Tuple with all information
 SYSLOG_LOG_TYPE = LogType(
     name="syslog",
@@ -279,9 +256,6 @@ XXX_RE = re.compile(r"^.*$")
 
 # Date format for an xxx date
 XXX_DATE_FORMAT = None
-
-# Output format for a xxx line
-XXX_OUTPUT_FORMAT = "DATE {content}"
 
 # Tuple with all information
 XXX_LOG_TYPE = LogType(
