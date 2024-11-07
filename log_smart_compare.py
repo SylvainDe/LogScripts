@@ -24,12 +24,6 @@ from log_types import (
     JenkinsLogType,
     JournalCtlLogType,
     SysLogLogType,
-    DmesgDefaultLogType,
-    DmesgHumanTimestampsLogType,
-    DmesgRawLogType,
-    JenkinsLogType,
-    JournalCtlLogType,
-    SysLogLogType,
 )
 
 
