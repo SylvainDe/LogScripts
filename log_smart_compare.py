@@ -181,7 +181,7 @@ if __name__ == "__main__":
     # Get arguments
     args = parser.parse_args()
     group_keys = default_group_keys if args.key is None else args.key
-    log_type = get_log_config_from_arg(args.format)
+    log_type = get_log_config_from_arg(args.format, args.files)
 
     # Perform comparison
     compare_files(args.files, log_type, group_keys, args.difftool)

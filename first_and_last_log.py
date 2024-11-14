@@ -14,13 +14,13 @@ from log_types import (
 )
 
 
-def process_file(f, log_re):
+def process_file(input_file, log_re):
     no_match = list()
     # TODO: This part should be different based on the log type
     key_format = "{processid}/{threadid}"
     lines_by_key = dict()
 
-    for line in f:
+    for line in input_file:
         line = line.strip()
         if line:
             m = re.match(log_re, line)
@@ -55,8 +55,9 @@ if __name__ == "__main__":
 
     # Get arguments
     args = parser.parse_args()
-    log_type = get_log_config_from_arg(args.format)
+    input_file = args.file
+    log_type = get_log_config_from_arg(args.format, [input_file])
     log_re = log_type.regex
 
     # Do process
-    process_file(args.file, log_re)
+    process_file(input_file, log_re)

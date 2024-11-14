@@ -215,20 +215,47 @@ LOG_CONFIGS = {log_type.name: log_type for log_type in LOG_TYPES}
 #    parser.add_argument("-format", **LOG_CONFIG_ARG)
 #########################################
 LOG_CONFIG_ARG = {
-    "choices": LOG_CONFIGS.keys(),
-    "default": "ulogcat",
+    "choices": LOG_CONFIGS.keys() | set(["auto"]),
+    "default": "auto",
     "help": "Log format",
 }
 
 
-def get_log_config_from_arg(log_type_name):
-    return LOG_CONFIGS[log_type_name]
+def count_matches(log_type, lst_of_lst_of_lines):
+    count = sum(
+        sum(re.match(log_type.regex, line.strip()) is not None for line in lines)
+        for lines in lst_of_lst_of_lines
+    )
+#    print(log_type.name, count, sum(len(lines) for lines in lst_of_lst_of_lines))
+    return count
+
+
+def detect_log_type(lst_of_lst_of_lines):
+    match_count = [
+        (log_type, count_matches(log_type, lst_of_lst_of_lines))
+        for log_type in LOG_TYPES
+    ]
+    max_count = max(count for _, count in match_count)
+    return [log_type for log_type, count in match_count if count == max_count]
+
+
+def get_log_config_from_arg(log_type_name, input_files):
+    if log_type_name in LOG_CONFIGS:
+        return LOG_CONFIGS[log_type_name]
+    lst_of_lst_of_lines = [list(f) for f in input_files]
+    # Reset to beginning of file
+    for f in input_files:
+        f.seek(0)
+    detected = detect_log_type(lst_of_lst_of_lines)
+    used = detected[0]
+    print("Using", used.name, "(chosen among the top", len(detected), "matches)")
+    return used
 
 
 # TESTS
 #########################################
 def test_log_type_for_examples(log_type):
-    print(log_type.name)
+    print("test_log_type_for_examples:", log_type.name)
     log_re = log_type.regex
     date_format = log_type.date_format
     local = log_type.date_locale
@@ -252,6 +279,16 @@ def test_log_type_for_examples(log_type):
         locale.setlocale(locale.LC_ALL, prev_locale)
 
 
+def test_detect_log_types(log_type):
+    print("test_detect_log_types:", log_type.name)
+    detected = detect_log_type([log_type.examples])
+    assert log_type in detected
+    assert len(detected) < 5
+    if len(detected) > 2:
+        print(" ! ", log_type.name, [t.name for t in detected])
+
+
 if __name__ == "__main__":
     for log_type in LOG_TYPES:
         test_log_type_for_examples(log_type)
+        test_detect_log_types(log_type)

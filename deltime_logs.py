@@ -61,11 +61,15 @@ if __name__ == "__main__":
     )
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
-        "-diff", choices="first last next", default="first", help="Difference type"
+        "-diff",
+        choices=["first", "last", "next"],
+        default="first",
+        help="Difference type",
     )
     parser.add_argument("-matching", default="", help="Matching")
 
     # Get arguments
     args = parser.parse_args()
-    log_type = get_log_config_from_arg(args.format)
-    process_file(args.file, log_type, args.diff, args.matching)
+    input_file = args.file
+    log_type = get_log_config_from_arg(args.format, [input_file])
+    process_file(input_file, log_type, args.diff, args.matching)
