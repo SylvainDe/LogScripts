@@ -4,7 +4,10 @@ of logs as it can make things easier to understand sometimes.
 """
 import re
 import datetime
-from log_types import LOG_CONFIGS
+from log_types import (
+    LOG_CONFIG_ARG,
+    get_log_config_from_arg,
+)
 
 
 def get_timed_lines(input_file, log_type):
@@ -56,9 +59,7 @@ if __name__ == "__main__":
         type=argparse.FileType("r", encoding="ISO-8859-1"),
         help="Input file",
     )
-    parser.add_argument(
-        "-format", choices=LOG_CONFIGS.keys(), default="ulogcat", help="Log format"
-    )
+    parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
         "-diff", choices="first last next", default="first", help="Difference type"
     )
@@ -66,5 +67,5 @@ if __name__ == "__main__":
 
     # Get arguments
     args = parser.parse_args()
-    log_type = LOG_CONFIGS[args.format]
+    log_type = get_log_config_from_arg(args.format)
     process_file(args.file, log_type, args.diff, args.matching)

@@ -14,7 +14,9 @@ import subprocess
 
 import log_types
 from log_types import (
-    LOG_CONFIGS,
+    LOG_TYPES,
+    LOG_CONFIG_ARG,
+    get_log_config_from_arg,
     UlogcatLongLogType,
     UlogcatShortLogType,
     LogcatLogType,
@@ -149,9 +151,7 @@ if __name__ == "__main__":
         nargs="+",
         help="Input files",
     )
-    parser.add_argument(
-        "-format", choices=LOG_CONFIGS.keys(), default="ulogcat", help="Log format"
-    )
+    parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
         "-difftool", default="meld", help="Diff tool such as meld or kompare"
     )
@@ -172,7 +172,7 @@ if __name__ == "__main__":
             ";".join(
                 " for %s: %s"
                 % (log_type.name, ", ".join(log_type.regex.groupindex.keys()))
-                for log_type in LOG_CONFIGS.values()
+                for log_type in LOG_TYPES
             ),
             default_group_keys,
         ),
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     # Get arguments
     args = parser.parse_args()
     group_keys = default_group_keys if args.key is None else args.key
-    log_type = LOG_CONFIGS[args.format]
+    log_type = get_log_config_from_arg(args.format)
 
     # Perform comparison
     compare_files(args.files, log_type, group_keys, args.difftool)

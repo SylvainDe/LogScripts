@@ -8,7 +8,10 @@ import re
 import tempfile
 import os
 import subprocess
-from log_types import LOG_CONFIGS
+from log_types import (
+    LOG_CONFIG_ARG,
+    get_log_config_from_arg,
+)
 
 
 def process_file(f, log_re):
@@ -48,13 +51,12 @@ if __name__ == "__main__":
         type=argparse.FileType("r", encoding="ISO-8859-1"),
         help="Input file",
     )
-    parser.add_argument(
-        "-format", choices=LOG_CONFIGS.keys(), default="ulogcat", help="Log format"
-    )
+    parser.add_argument("-format", **LOG_CONFIG_ARG)
 
     # Get arguments
     args = parser.parse_args()
-    log_re = LOG_CONFIGS[args.format].regex
+    log_type = get_log_config_from_arg(args.format)
+    log_re = log_type.regex
 
     # Do process
     process_file(args.file, log_re)

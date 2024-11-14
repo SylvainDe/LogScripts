@@ -98,7 +98,7 @@ class DmesgHumanTimestampsLogType(LogType):
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_print_event_data : event_type (5), ifidx: 0 bssidx: 0 status:0 reason:7",
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] Mode AP/GO. Event:5 status:0 reason:7",
         "[Fri May 12 15:41:55 2023] CFG80211-INFO) wl_notify_connect_status_ap : [wlan0] del sta event for 4e:37:29:ae:b2:0d",
-#        "[jeu. nov.  7 13:16:43 2024] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=19",
+        #        "[jeu. nov.  7 13:16:43 2024] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=19",
     ]
     regex = DMESG_RE
     date_format = "%a %b %d %H:%M:%S %Y"
@@ -208,6 +208,21 @@ LOG_TYPES = [
 
 # Mapping from name of the log format to log information
 LOG_CONFIGS = {log_type.name: log_type for log_type in LOG_TYPES}
+
+
+# ARGPARSE CONFIGURATION
+# To be used like this:
+#    parser.add_argument("-format", **LOG_CONFIG_ARG)
+#########################################
+LOG_CONFIG_ARG = {
+    "choices": LOG_CONFIGS.keys(),
+    "default": "ulogcat",
+    "help": "Log format",
+}
+
+
+def get_log_config_from_arg(log_type_name):
+    return LOG_CONFIGS[log_type_name]
 
 
 # TESTS
