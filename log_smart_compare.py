@@ -33,16 +33,16 @@ from log_types import (
 UlogcatLongLogType.output_format = (
     "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}"
 )
-UlogcatShortLogType.output_format = ("{level} {tag} ({processname}): {clean_content}",)
-LogcatLogType.output_format = ("DATE PID TID {level} {tag} {clean_content}",)
-DmesgDefaultLogType.output_format = ("DATE {processid} {clean_content}",)
-DmesgHumanTimestampsLogType.output_format = ("DATE {processid} {clean_content}",)
-DmesgRawLogType.output_format = ("DATE {processid} {clean_content}",)
-JenkinsLogType.output_format = ("DATE {content}",)
+UlogcatShortLogType.output_format = "{level} {tag} ({processname}): {clean_content}"
+LogcatLogType.output_format = "DATE PID TID {level} {tag} {clean_content}"
+DmesgDefaultLogType.output_format = "DATE {processid} {clean_content}"
+DmesgHumanTimestampsLogType.output_format = "DATE {processid} {clean_content}"
+DmesgRawLogType.output_format = "DATE {processid} {clean_content}"
+JenkinsLogType.output_format = "DATE {content}"
 JournalCtlLogType.output_format = (
-    "DATE {hostname} {processname} {processid} {clean_content}",
+    "DATE {hostname} {processname} {processid} {clean_content}"
 )
-SysLogLogType.output_format = ("DATE {hostname} {processname} {clean_content}",)
+SysLogLogType.output_format = "DATE {hostname} {processname} {clean_content}"
 
 
 def clean_content(s):
