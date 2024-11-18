@@ -9,15 +9,37 @@ import tempfile
 import os
 import subprocess
 from log_types import (
+    LOG_TYPES,
     LOG_CONFIG_ARG,
     get_log_config_from_arg,
+    UlogcatLongLogType,
+    UlogcatShortLogType,
+    LogcatLogType,
+    DmesgDefaultLogType,
+    DmesgHumanTimestampsLogType,
+    DmesgRawLogType,
+    JenkinsLogType,
+    JournalCtlLogType,
+    SysLogLogType,
 )
 
 
-def process_file(input_file, log_re):
+# Add information about the key format to the log types
+UlogcatLongLogType.key_format = "{processid}/{threadid}"
+UlogcatShortLogType.key_format = "{processid}"
+LogcatLogType.key_format = "{processid}/{threadid}"
+DmesgDefaultLogType.key_format = "NO KEY DEFINED"
+DmesgHumanTimestampsLogType.key_format = "NO KEY DEFINED"
+DmesgRawLogType.key_format = "NO KEY DEFINED"
+JenkinsLogType.key_format = "{processid}"
+JournalCtlLogType.key_format = "{processid}"
+SysLogLogType.key_format = "NO KEY DEFINED"
+
+
+def process_file(input_file, log_type):
+    log_re = log_type.regex
+    key_format = log_type.key_format
     no_match = list()
-    # TODO: This part should be different based on the log type
-    key_format = "{processid}/{threadid}"
     lines_by_key = dict()
 
     for line in input_file:
@@ -57,7 +79,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     input_file = args.file
     log_type = get_log_config_from_arg(args.format, [input_file])
-    log_re = log_type.regex
 
     # Do process
-    process_file(input_file, log_re)
+    process_file(input_file, log_type)
