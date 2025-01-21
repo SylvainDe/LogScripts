@@ -67,6 +67,9 @@ def clean_content(s):
     s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
     # Replace hashcodes (like "@ce7ed73")
     s = re.sub("@{0}+".format(hex_low_case), "<hash>", s)
+    # Replace phone numbers (like "+39 351 1913193")
+    s = re.sub("\+[0-9 ]{7,}", "<phonenumber>", s)
+    s = re.sub("%2B[0-9 ]{7,}", "<phonenumber>", s)
     return s
 
 
