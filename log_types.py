@@ -68,7 +68,7 @@ class LogcatLogType(LogType):
 
 # Regexp for a dmesg line
 DMESG_RE = re.compile(
-    r"^(<\d+>)?\[(?P<date>[^]]+)\] (?P<processid>[^:]*:)?(?P<content>.*)$"
+    r"^(<\d+>)?\[(?P<date>[^]]+)\](?P<tid>\[[^]]+\])? (?P<processid>[^:]*:)?(?P<content>.*)$"
 )
 
 
@@ -84,6 +84,8 @@ class DmesgDefaultLogType(LogType):
         "[    4.849161] hub 3-0:1.0: [INFO][USB] 1 port detected",
         "[   13.118810] p2p is supported",
         "[15537.298409] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=192.168.1.30 DST=192.168.1.45 LEN=522 TOS=0x00 PREC=0x00 TTL=64",
+        "[    0.507223][    T1] init: Could not update logical partition",
+        "[    0.779734][  T168] cutils-trace: Error opening trace file: No such file or directory (2)",
     ]
     regex = DMESG_RE
     date_format = None
