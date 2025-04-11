@@ -111,6 +111,9 @@ def extract_data(f, log_type):
         for line in no_match:
             print("  '" + line + "'")
         print(log)
+    add_sorted_content = False
+    if add_sorted_content:
+        dict_all["clean_sorted"] = sorted(clean_lst)
     return bigdict
 
 
