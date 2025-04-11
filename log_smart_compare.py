@@ -65,6 +65,8 @@ def clean_content(s):
     )
     # Clean date (like "2008-01-01 12:27:32.963591 AM")
     s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
+    # Clean duration (like "0.07ms")
+    s = re.sub("\d+(\.\d+)? ?m?s", "<duration>", s)
     # Replace hashcodes (like "@ce7ed73")
     s = re.sub("@{0}+".format(hex_low_case), "<hash>", s)
     # Replace phone numbers (like "+39 351 1913193")
