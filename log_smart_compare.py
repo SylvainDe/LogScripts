@@ -63,9 +63,11 @@ def clean_content(s):
         "<uuid>",
         s,
     )
-    # Clean date (like "2008-01-01 12:27:32.963591 AM")
+    # Replace uid/pid (like "Uid: 10119")
+    s = re.sub("([UPup]id): *\d+", "\\1 <\\1>", s)
+    # Replace date (like "2008-01-01 12:27:32.963591 AM")
     s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
-    # Clean duration (like "0.07ms")
+    # Replace duration (like "0.07ms")
     s = re.sub("\d+(\.\d+)? ?m?s", "<duration>", s)
     # Replace hashcodes (like "@ce7ed73")
     s = re.sub("@{0}+".format(hex_low_case), "<hash>", s)
