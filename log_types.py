@@ -9,8 +9,12 @@ import locale
 class LogType:
     """Generic class for log types."""
 
-    pass
-
+    name = None
+    examples = None
+    regex = None
+    date_format = None
+    date_locale = None
+    is_used_in_autodetect = True
 
 class UlogcatLongLogType(LogType):
     """Handle logs from command 'ulogcat -v long'."""
@@ -28,7 +32,6 @@ class UlogcatLongLogType(LogType):
     )
 
     date_format = "%m-%d %H:%M:%S.%f"
-    date_locale = None
 
 
 class UlogcatShortLogType(LogType):
@@ -43,8 +46,6 @@ class UlogcatShortLogType(LogType):
     regex = re.compile(
         r"^(?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>[^)]*)\)\s*: ?(?P<content>.*)$"
     )
-    date_format = None
-    date_locale = None
 
 
 class LogcatLogType(LogType):
@@ -63,7 +64,6 @@ class LogcatLogType(LogType):
     )
 
     date_format = "%m-%d %H:%M:%S.%f"
-    date_locale = None
 
 
 # Regexp for a dmesg line
@@ -88,8 +88,6 @@ class DmesgDefaultLogType(LogType):
         "[    0.779734][  T168] cutils-trace: Error opening trace file: No such file or directory (2)",
     ]
     regex = DMESG_RE
-    date_format = None
-    date_locale = None
 
 
 class DmesgHumanTimestampsLogType(LogType):
@@ -104,7 +102,6 @@ class DmesgHumanTimestampsLogType(LogType):
     ]
     regex = DMESG_RE
     date_format = "%a %b %d %H:%M:%S %Y"
-    date_locale = None
 
 
 class DmesgRawLogType(LogType):
@@ -120,8 +117,6 @@ class DmesgRawLogType(LogType):
         "<4>[15779.293768] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=192.168.1.30",
     ]
     regex = DMESG_RE
-    date_format = None
-    date_locale = None
 
 
 class JenkinsLogType(LogType):
@@ -138,7 +133,6 @@ class JenkinsLogType(LogType):
     )
 
     date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
-    date_locale = None
 
 
 class JournalCtlLogType(LogType):
@@ -177,7 +171,19 @@ class SysLogLogType(LogType):
         r"^(?P<date>[^ ]* +\d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<content>.*)$"
     )
     date_format = "%b %d %H:%M:%S"
-    date_locale = None
+
+
+class RawLogType(LogType):
+    """Handle logs at the xxx format."""
+
+    name = "raw"
+    examples = [
+        "abc",
+        "42",
+    ]
+    regex = re.compile(r"^(?P<content>.*)$")
+    is_used_in_autodetect = False
+
 
 
 class XxxLogType(LogType):
@@ -186,8 +192,6 @@ class XxxLogType(LogType):
     name = "xxx"
     examples = []
     regex = re.compile(r"^.*$")
-    date_format = None
-    date_locale = None
 
 
 # FORMATS
@@ -202,6 +206,7 @@ LOG_TYPES = [
     JenkinsLogType,
     JournalCtlLogType,
     SysLogLogType,
+    RawLogType,
 ]
 
 
@@ -216,9 +221,11 @@ LOG_CONFIGS = {log_type.name: log_type for log_type in LOG_TYPES}
 # To be used like this:
 #    parser.add_argument("-format", **LOG_CONFIG_ARG)
 #########################################
+AUTOMATIC_OPTION = "auto"
+assert AUTOMATIC_OPTION not in LOG_CONFIGS
 LOG_CONFIG_ARG = {
-    "choices": LOG_CONFIGS.keys() | set(["auto"]),
-    "default": "auto",
+    "choices": LOG_CONFIGS.keys() | set([AUTOMATIC_OPTION]),
+    "default": AUTOMATIC_OPTION,
     "help": "Log format",
 }
 
@@ -236,6 +243,7 @@ def detect_log_type(lst_of_lst_of_lines):
     match_count = [
         (log_type, count_matches(log_type, lst_of_lst_of_lines))
         for log_type in LOG_TYPES
+        if log_type.is_used_in_autodetect
     ]
     max_count = max(count for _, count in match_count)
     return [log_type for log_type, count in match_count if count == max_count]
@@ -244,6 +252,7 @@ def detect_log_type(lst_of_lst_of_lines):
 def get_log_config_from_arg(log_type_name, input_files):
     if log_type_name in LOG_CONFIGS:
         return LOG_CONFIGS[log_type_name]
+    assert log_type_name == AUTOMATIC_OPTION
     lst_of_lst_of_lines = [list(f) for f in input_files]
     # Reset to beginning of file
     for f in input_files:
@@ -292,5 +301,8 @@ def test_detect_log_types(log_type):
 
 if __name__ == "__main__":
     for log_type in LOG_TYPES:
+        if log_type.name is None:
+            continue
         test_log_type_for_examples(log_type)
-        test_detect_log_types(log_type)
+        if log_type.is_used_in_autodetect:
+            test_detect_log_types(log_type)

@@ -26,6 +26,7 @@ from log_types import (
     JenkinsLogType,
     JournalCtlLogType,
     SysLogLogType,
+    RawLogType,
 )
 
 
@@ -43,6 +44,7 @@ JournalCtlLogType.output_format = (
     "DATE {hostname} {processname} {processid} {clean_content}"
 )
 SysLogLogType.output_format = "DATE {hostname} {processname} {clean_content}"
+RawLogType.output_format = "{clean_content}"
 
 
 def clean_content(s):
