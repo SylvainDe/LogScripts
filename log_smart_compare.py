@@ -79,19 +79,26 @@ def clean_content(s):
     return s
 
 
+# Relevant patterns - currently hardcoded - to be configurable in the future
+patterns = []
+patterns = [re.compile(p, re.IGNORECASE) for p in patterns]
+
+
 def extract_data(f, log_type):
     """Extract relevant data from file - return a dictionnary."""
-    log_re = log_type.regex
+    log_re = re.compile(log_type.regex)
     out_format = log_type.output_format
     bigdict = dict()
     dict_all = bigdict.setdefault("ALL", dict())
     clean_lst = dict_all.setdefault("clean", [])
     original_lst = dict_all.setdefault("original", [])
     no_match = dict_all.setdefault("nomatch", [])
+    filtered_lst = dict_all.setdefault("filtered", [])
+    patterns_list = bigdict.setdefault("patterns", dict())
     for line in f:
         line = line.strip()
         if line:
-            m = re.match(log_re, line)
+            m = log_re.match(line)
             if m is None:
                 no_match.append(line)
             else:
@@ -104,6 +111,13 @@ def extract_data(f, log_type):
                 for k, v in d.items():
                     bigdict.setdefault(k, dict()).setdefault(v, []).append(out_line)
                 clean_lst.append(out_line)
+                add_to_filtered = False
+                for p in patterns:
+                    if p.search(line):
+                        patterns_list.setdefault(p, []).append(out_line)
+                        add_to_filtered = True
+                if add_to_filtered:
+                    filtered_lst.append(out_line)
             original_lst.append(line)
     if no_match:
         log = "%s lines from %s did not match (out of %s):" % (
@@ -118,6 +132,7 @@ def extract_data(f, log_type):
     add_sorted_content = False
     if add_sorted_content:
         dict_all["clean_sorted"] = sorted(clean_lst)
+        dict_all["filtered_sorted"] = sorted(filtered_lst)
     return bigdict
 
 
@@ -174,6 +189,7 @@ if __name__ == "__main__":
         "level",
         "processname",
         "processid",
+        "patterns",
         "ALL",
     ]
     parser.add_argument(
