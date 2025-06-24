@@ -16,6 +16,7 @@ class LogType:
     date_locale = None
     is_used_in_autodetect = True
 
+
 class UlogcatLongLogType(LogType):
     """Handle logs from command 'ulogcat -v long'."""
 
@@ -185,7 +186,6 @@ class RawLogType(LogType):
     is_used_in_autodetect = False
 
 
-
 class XxxLogType(LogType):
     """Handle logs at the xxx format."""
 
@@ -235,7 +235,7 @@ def count_matches(log_type, lst_of_lst_of_lines):
         sum(re.match(log_type.regex, line.strip()) is not None for line in lines)
         for lines in lst_of_lst_of_lines
     )
-#    print(log_type.name, count, sum(len(lines) for lines in lst_of_lst_of_lines))
+    #    print(log_type.name, count, sum(len(lines) for lines in lst_of_lst_of_lines))
     return count
 
 
