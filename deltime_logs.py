@@ -12,13 +12,27 @@ from log_types import (
 
 def get_timed_lines(input_file, log_type):
     log_re, date_format = log_type.regex, log_type.date_format
-    for line in input_file:
+    no_match = list()
+    lines = list(input_file)
+    for line in lines:
         line = line.strip()
         if line:
             m = re.match(log_re, line)
-            if m is not None:
+            if m is None:
+                no_match.append(line)
+            else:
                 d = datetime.datetime.strptime(m.groupdict()["date"], date_format)
                 yield d, line
+    if no_match:
+        log = "%s lines from %s did not match (out of %s):" % (
+            len(no_match),
+            input_file.name,
+            len(lines),
+        )
+        print(log)
+        for line in no_match:
+            print("  '" + line + "'")
+        print(log)
 
 
 def get_ms(td):

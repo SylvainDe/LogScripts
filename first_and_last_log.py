@@ -41,8 +41,8 @@ def process_file(input_file, log_type):
     key_format = log_type.key_format
     no_match = list()
     lines_by_key = dict()
-
-    for line in input_file:
+    lines = list(input_file)
+    for line in lines:
         line = line.strip()
         if line:
             m = re.match(log_re, line)
@@ -53,7 +53,15 @@ def process_file(input_file, log_type):
                 key_str = key_format.format(**d)
                 lines_by_key.setdefault(key_str, []).append(line)
     if no_match:
-        print("%d lines did not match regexp", len(no_match))
+        log = "%s lines from %s did not match (out of %s):" % (
+            len(no_match),
+            input_file.name,
+            len(lines),
+        )
+        print(log)
+        for line in no_match:
+            print("  '" + line + "'")
+        print(log)
 
     for k, v_lst in lines_by_key.items():
         print()
