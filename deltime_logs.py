@@ -10,8 +10,7 @@ from log_types import (
 )
 
 
-def get_timed_lines(input_file, log_type):
-    log_re, date_format = log_type.regex, log_type.date_format
+def get_timed_lines(input_file, log_re, date_format):
     no_match = list()
     lines = list(input_file)
     for line in lines:
@@ -40,10 +39,13 @@ def get_ms(td):
 
 
 def process_file(input_file, log_type, diff_type, matching, output_format):
-    timed_lines = list(get_timed_lines(input_file, log_type))
+    log_re, date_format = log_type.regex, log_type.date_format
+    timed_lines = list(get_timed_lines(input_file, log_re, date_format))
     matching_compiled = re.compile(matching)
     abs_time = None
-    if diff_type in ("first", "last"):
+    if diff_type == "absolute":
+        abs_time = datetime.datetime.strptime(matching, date_format)
+    elif diff_type in ("first", "last"):
         matches = [d for d, line in timed_lines if re.search(matching_compiled, line)]
         if not matches:
             print("No match for", matching, "in the", len(timed_lines), "lines")
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
         "-diff",
-        choices=["first", "last", "next"],
+        choices=["first", "last", "next", "absolute"],
         default="first",
         help="Difference type",
     )
