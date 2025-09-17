@@ -129,10 +129,12 @@ def extract_data(f, log_type):
         for line in no_match:
             print("  '" + line + "'")
         print(log)
-    add_sorted_content = False
-    if add_sorted_content:
-        dict_all["clean_sorted"] = sorted(clean_lst)
-        dict_all["filtered_sorted"] = sorted(filtered_lst)
+    # Add sorted content
+    for k, v in list(bigdict.items()):
+        sorted_dict = dict()
+        bigdict[k + "_sorted"] = sorted_dict
+        for k2, v2 in v.items():
+            sorted_dict[k2] = sorted(v2)
     return bigdict
 
 
@@ -191,6 +193,7 @@ if __name__ == "__main__":
         "processid",
         "patterns",
         "ALL",
+        "ALL_sorted",
     ]
     parser.add_argument(
         "-key",
