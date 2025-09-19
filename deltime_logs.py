@@ -38,19 +38,22 @@ def get_ms(td):
     return "" if td is None else int(td / datetime.timedelta(milliseconds=1))
 
 
-def process_file(input_file, log_type, diff_type, matching, output_format):
+def process_file(input_file, log_type, ref_type, reference, output_format):
     log_re, date_format = log_type.regex, log_type.date_format
     timed_lines = list(get_timed_lines(input_file, log_re, date_format))
-    matching_compiled = re.compile(matching)
     abs_time = None
-    if diff_type == "absolute":
-        abs_time = datetime.datetime.strptime(matching, date_format)
-    elif diff_type in ("first", "last"):
-        matches = [d for d, line in timed_lines if re.search(matching_compiled, line)]
+    if ref_type == "absolute":
+        abs_time = datetime.datetime.strptime(reference, date_format)
+    elif ref_type in ("first", "last"):
+        reference_compiled = re.compile(reference)
+        matches = [d for d, line in timed_lines if re.search(reference_compiled, line)]
         if not matches:
-            print("No match for", matching, "in the", len(timed_lines), "lines")
+            print("No match for", reference, "in the", len(timed_lines), "lines")
             return
-        abs_time = matches[0 if diff_type == "first" else -1]
+        abs_time = matches[0 if ref_type == "first" else -1]
+    else:
+        assert ref_type == "prev"
+        reference_compiled = re.compile(reference)
 
     prev_d = None
     for d, line in timed_lines:
@@ -58,7 +61,7 @@ def process_file(input_file, log_type, diff_type, matching, output_format):
             diff = d - abs_time
         else:
             diff = None if prev_d is None else (d - prev_d)
-            if re.search(matching_compiled, line):
+            if re.search(reference_compiled, line):
                 prev_d = d
         print(output_format.format(get_ms(diff), line))
 
@@ -75,12 +78,16 @@ if __name__ == "__main__":
     )
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
-        "-diff",
-        choices=["first", "last", "next", "absolute"],
+        "-ref_type",
+        choices=["absolute", "first", "last", "prev"],
         default="first",
-        help="Difference type",
+        help="""Type of time reference:
+ - absolute: use time provided (should match input file date format)
+ - first: use time from the first line matching the reference param
+ - last: use time from the last line matching the reference param
+ - prev: use time from the prev line matching the reference param""",
     )
-    parser.add_argument("-matching", default="", help="Matching")
+    parser.add_argument("-reference", default="", help="Reference")
     output_format = "[{0:>8} ms] {1}"
     parser.add_argument(
         "-outputformat",
@@ -95,4 +102,4 @@ if __name__ == "__main__":
     print(args)
     input_file = args.file
     log_type = get_log_config_from_arg(args.format, [input_file])
-    process_file(input_file, log_type, args.diff, args.matching, args.outputformat)
+    process_file(input_file, log_type, args.ref_type, args.reference, args.outputformat)
