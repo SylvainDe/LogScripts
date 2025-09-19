@@ -81,7 +81,11 @@ def clean_content(s):
 
 # Relevant patterns - currently hardcoded - to be configurable in the future
 patterns = []
-patterns = [re.compile(p, re.IGNORECASE) for p in patterns]
+# Make the list into a more usable structure: a dict mapping strings to compiled
+# regexp which also includes a combinations of all regexps
+patterns = {p: p for p in patterns}
+patterns["ALL"] = "|".join(pat_re for pat_re in patterns)
+patterns = {k: re.compile(v, re.IGNORECASE) for k, v in patterns.items()}
 
 
 def extract_data(f, log_type):
@@ -93,7 +97,6 @@ def extract_data(f, log_type):
     clean_lst = dict_all.setdefault("clean", [])
     original_lst = dict_all.setdefault("original", [])
     no_match = dict_all.setdefault("nomatch", [])
-    filtered_lst = dict_all.setdefault("filtered", [])
     patterns_list = bigdict.setdefault("patterns", dict())
     for line in f:
         line = line.strip()
@@ -111,13 +114,9 @@ def extract_data(f, log_type):
                 for k, v in d.items():
                     bigdict.setdefault(k, dict()).setdefault(v, []).append(out_line)
                 clean_lst.append(out_line)
-                add_to_filtered = False
-                for p in patterns:
-                    if p.search(line):
-                        patterns_list.setdefault(p, []).append(out_line)
-                        add_to_filtered = True
-                if add_to_filtered:
-                    filtered_lst.append(out_line)
+                for pat_name, pat_re in patterns.items():
+                    if pat_re.search(line):
+                        patterns_list.setdefault(pat_name, []).append(out_line)
             original_lst.append(line)
     if no_match:
         log = "%s lines from %s did not match (out of %s):" % (
