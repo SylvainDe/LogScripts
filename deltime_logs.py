@@ -38,7 +38,7 @@ def get_ms(td):
     return "" if td is None else int(td / datetime.timedelta(milliseconds=1))
 
 
-def process_file(input_file, log_type, ref_type, reference, output_format):
+def process_file(input_file, log_type, ref_type, reference, delta, output_format):
     log_re, date_format = log_type.regex, log_type.date_format
     timed_lines = list(get_timed_lines(input_file, log_re, date_format))
     abs_time = None
@@ -63,7 +63,7 @@ def process_file(input_file, log_type, ref_type, reference, output_format):
             diff = None if prev_d is None else (d - prev_d)
             if re.search(reference_compiled, line):
                 prev_d = d
-        print(output_format.format(get_ms(diff), line))
+        print(output_format.format(get_ms(diff + delta), line))
 
 
 if __name__ == "__main__":
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
-        "-ref_type",
+        "-ref-type",
         choices=["absolute", "first", "last", "prev"],
         default="first",
         help="""Type of time reference:
@@ -88,6 +88,7 @@ if __name__ == "__main__":
  - prev: use time from the prev line matching the reference param""",
     )
     parser.add_argument("-reference", default="", help="Reference")
+    parser.add_argument("-delta", default=0, help="Delta (in ms) which is assigned to reference", type=int)
     output_format = "[{0:>8} ms] {1}"
     parser.add_argument(
         "-outputformat",
@@ -102,4 +103,5 @@ if __name__ == "__main__":
     print(args)
     input_file = args.file
     log_type = get_log_config_from_arg(args.format, [input_file])
-    process_file(input_file, log_type, args.ref_type, args.reference, args.outputformat)
+    delta = datetime.timedelta(milliseconds = args.delta)
+    process_file(input_file, log_type, args.ref_type, args.reference, delta, args.outputformat)
