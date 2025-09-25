@@ -34,8 +34,10 @@ def get_timed_lines(input_file, log_re, date_format):
         print(log)
 
 
-def get_ms(td):
-    return "" if td is None else int(td / datetime.timedelta(milliseconds=1))
+def get_ms(td, delta):
+    if td is None:
+        return ""
+    return int((td + delta) / datetime.timedelta(milliseconds=1))
 
 
 def process_file(input_file, log_type, ref_type, reference, delta, output_format):
@@ -63,7 +65,7 @@ def process_file(input_file, log_type, ref_type, reference, delta, output_format
             diff = None if prev_d is None else (d - prev_d)
             if re.search(reference_compiled, line):
                 prev_d = d
-        print(output_format.format(get_ms(diff + delta), line))
+        print(output_format.format(get_ms(diff, delta), line))
 
 
 if __name__ == "__main__":
