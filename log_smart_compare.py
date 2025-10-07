@@ -46,6 +46,9 @@ JournalCtlLogType.output_format = (
 SysLogLogType.output_format = "DATE {hostname} {processname} {clean_content}"
 RawLogType.output_format = "{clean_content}"
 
+grouped_values = {
+    "processthreadnames": ("processname", "threadname"),
+}
 
 def clean_content(s):
     hex_ign_case = "[0-9a-fA-F]"
@@ -111,6 +114,9 @@ def extract_data(f, log_type):
                 except KeyError:
                     pass
                 out_line = out_format.format(**d)
+                for group_name, group_values in grouped_values.items():
+                    if all(v in d for v in group_values):
+                        d[group_name] = "_".join(str(d[v]) for v in group_values)
                 for k, v in d.items():
                     bigdict.setdefault(k, dict()).setdefault(v, []).append(out_line)
                 clean_lst.append(out_line)
@@ -190,6 +196,7 @@ if __name__ == "__main__":
         "level",
         "processname",
         "processid",
+        "processthreadnames",
         "patterns",
         "ALL",
         "ALL_sorted",
