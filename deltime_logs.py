@@ -90,7 +90,12 @@ if __name__ == "__main__":
  - prev: use time from the prev line matching the reference param""",
     )
     parser.add_argument("-reference", default="", help="Reference")
-    parser.add_argument("-delta", default=0, help="Delta (in ms) which is assigned to reference", type=int)
+    parser.add_argument(
+        "-delta",
+        default=0,
+        help="Delta (in ms) which is assigned to reference",
+        type=int,
+    )
     output_format = "[{0:>8} ms] {1}"
     parser.add_argument(
         "-outputformat",
@@ -105,5 +110,7 @@ if __name__ == "__main__":
     print(args)
     input_file = args.file
     log_type = get_log_config_from_arg(args.format, [input_file])
-    delta = datetime.timedelta(milliseconds = args.delta)
-    process_file(input_file, log_type, args.ref_type, args.reference, delta, args.outputformat)
+    delta = datetime.timedelta(milliseconds=args.delta)
+    process_file(
+        input_file, log_type, args.ref_type, args.reference, delta, args.outputformat
+    )

@@ -6,6 +6,7 @@ Hence, the script tries to get the relevant data and stores them with a clean fo
 Then, the output folders can be compared with a proper tool such as meld or kompare.
 """
 
+
 import sys
 import re
 import tempfile
@@ -49,6 +50,7 @@ RawLogType.output_format = "{clean_content}"
 grouped_values = {
     "processthreadnames": ("processname", "threadname"),
 }
+
 
 def clean_content(s):
     hex_ign_case = "[0-9a-fA-F]"
