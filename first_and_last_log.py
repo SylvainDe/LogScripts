@@ -21,12 +21,14 @@ from log_types import (
     JenkinsLogType,
     JournalCtlLogType,
     SysLogLogType,
+    ZazuSocLogType,
 )
 
 
 # Add information about the key format to the log types
 UlogcatLongLogType.key_format = "{processid}/{threadid}"
 UlogcatShortLogType.key_format = "{processid}"
+ZazuSocLogType.key_format = "{processname}"
 LogcatLogType.key_format = "{processid}/{threadid}"
 DmesgDefaultLogType.key_format = "NO KEY DEFINED"
 DmesgHumanTimestampsLogType.key_format = "NO KEY DEFINED"

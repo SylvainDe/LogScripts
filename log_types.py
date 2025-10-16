@@ -156,7 +156,7 @@ class JournalCtlLogType(LogType):
 
 
 class SysLogLogType(LogType):
-    """Handle logs at the syslog format - for example from the command 'sudo cat /var/log/syslog'."""
+    """Handle logs in the syslog format - for example from the command 'sudo cat /var/log/syslog'."""
 
     name = "syslog"
     examples = [
@@ -174,8 +174,20 @@ class SysLogLogType(LogType):
     date_format = "%b %d %H:%M:%S"
 
 
+class ZazuSocLogType(LogType):
+    """Handle logs in the zazu soc log format."""
+
+    name = "zazusoc"
+    examples = [
+        "[I 2025-10-14 09:53:34] None                 b'I DISPMAN     (display-focus-m)                : onConnected: a new display session is connected\r'",
+        '[I 2025-10-14 09:53:34] None                 b"I DISPMAN     (display-focus-m)                : DisplayFocusInterface::recvMessage: received register request for session\r"'
+    ]
+    regex = re.compile(r"^\[I (?P<date>\d+-\d+-\d+ \d+:\d+:\d+)\] None\s+b['\"](?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>.*)\)\s*: ?(?P<content>.*)$")
+    date_format = "%Y-%m-%d %H:%M:%S"
+
+
 class RawLogType(LogType):
-    """Handle logs at the xxx format."""
+    """Handle logs in the xxx format."""
 
     name = "raw"
     examples = [
@@ -206,6 +218,7 @@ LOG_TYPES = [
     JenkinsLogType,
     JournalCtlLogType,
     SysLogLogType,
+    ZazuSocLogType,
     RawLogType,
 ]
 
@@ -300,6 +313,11 @@ def test_detect_log_types(log_type):
 
 
 if __name__ == "__main__":
+    # Optional: add lines from file for testing purpose
+    logfiles = dict()
+    for log_type, filename in logfiles.items():
+        lines = [l.strip() for l in open(filename)]
+        log_type.examples.extend(lines)
     for log_type in LOG_TYPES:
         if log_type.name is None:
             continue
