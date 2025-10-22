@@ -88,6 +88,12 @@ def clean_content(s):
     return s
 
 
+# Dict mapping to names of the fields to be cleaned to the pair
+# (cleaning function, name of the cleaned field)
+cleanup_functions = {
+    "content": (clean_content, "clean_content"),
+}
+
 # Relevant patterns - currently hardcoded - to be configurable in the future
 patterns = []
 # Make the list into a more usable structure: a dict mapping strings to compiled
@@ -115,10 +121,10 @@ def extract_data(f, log_type):
                 no_match.append(line)
             else:
                 d = m.groupdict()
-                try:
-                    d["clean_content"] = clean_content(d["content"])
-                except KeyError:
-                    pass
+                for field, (func, clean_field) in cleanup_functions.items():
+                    val = d.get(field)
+                    if val is not None:
+                        d[clean_field] = func(d[field])
                 out_line = out_format.format(**d)
                 for group_name, group_values in grouped_values.items():
                     if all(v in d for v in group_values):
