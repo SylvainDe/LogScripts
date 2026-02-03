@@ -10,7 +10,7 @@ from log_types import (
 )
 
 
-def get_timed_lines(input_file, log_re, date_format):
+def get_timed_lines(input_file, log_re, date_obj_from_str):
     no_match = list()
     lines = list(input_file)
     for line in lines:
@@ -20,7 +20,7 @@ def get_timed_lines(input_file, log_re, date_format):
             if m is None:
                 no_match.append(line)
             else:
-                d = datetime.datetime.strptime(m.groupdict()["date"], date_format)
+                d = date_obj_from_str(m.groupdict()["date"])
                 yield d, line
     if no_match:
         log = "%s lines from %s did not match (out of %s):" % (
@@ -56,14 +56,14 @@ def get_diff_from_rel_time(timed_lines, re_ref):
 
 
 def process_file(input_file, log_type, ref_type, reference, delta, output_format):
-    log_re, date_format = log_type.regex, log_type.date_format
-    timed_lines = list(get_timed_lines(input_file, log_re, date_format))
+    log_re, date_obj_from_str = log_type.regex, log_type.date_obj_from_str
+    timed_lines = list(get_timed_lines(input_file, log_re, date_obj_from_str))
     do_reverse = ref_type in ("last", "next")
     if do_reverse:
         timed_lines = list(reversed(timed_lines))
     abs_time = None
     if ref_type == "absolute":
-        abs_time = datetime.datetime.strptime(reference, date_format)
+        abs_time = date_obj_from_str(reference)
         lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
     elif ref_type in ("first", "last"):
         reference_compiled = re.compile(reference)

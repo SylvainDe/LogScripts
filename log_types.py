@@ -6,13 +6,26 @@ import datetime
 import locale
 
 
+def get_date_from_str_and_format(string, date_format):
+    return datetime.datetime.strptime(string, date_format)
+
+
+def get_str_from_date_and_format(date_obj, date_format):
+    return date_obj.strftime(date_format)
+
+
+def get_date_methods_from_format(date_format):
+    return lambda s: get_date_from_str_and_format(s, date_format), lambda d: get_str_from_date_and_format(d, date_format)
+
+
 class LogType:
     """Generic class for log types."""
 
     name = None
     examples = None
     regex = None
-    date_format = None
+    date_obj_from_str = None
+    str_from_date_obj = None
     date_locale = None
     is_used_in_autodetect = True
 
@@ -32,7 +45,7 @@ class UlogcatLongLogType(LogType):
         r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d) (?P<level>.) (?P<tag>[^( ]*)\s*\((?:(?P<processname>.*)-(?P<processid>.*)\/)?(?P<threadname>[^\/]*)-(?P<threadid>\d+)\)\s*: ?(?P<content>.*)$"
     )
 
-    date_format = "%m-%d %H:%M:%S.%f"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
 
 
 class UlogcatShortLogType(LogType):
@@ -64,7 +77,7 @@ class LogcatLogType(LogType):
         r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<processid>\d+)\s+(?P<threadid>\d+)\s+(?P<level>.)\s+(?P<tag>[^:]*):(?P<content>.*)$"
     )
 
-    date_format = "%m-%d %H:%M:%S.%f"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
 
 
 # Regexp for a dmesg line
@@ -102,7 +115,7 @@ class DmesgHumanTimestampsLogType(LogType):
         #        "[jeu. nov.  7 13:16:43 2024] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=19",
     ]
     regex = DMESG_RE
-    date_format = "%a %b %d %H:%M:%S %Y"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%a %b %d %H:%M:%S %Y")
 
 
 class DmesgRawLogType(LogType):
@@ -133,7 +146,7 @@ class JenkinsLogType(LogType):
         r"^\[(?P<date>[0-9TZ:.-]*)\](?P<progress> \[\s*\d+% \d+/\d+])? ?(?P<content>.*)$"
     )
 
-    date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 class JournalCtlLogType(LogType):
@@ -151,7 +164,7 @@ class JournalCtlLogType(LogType):
     regex = re.compile(
         r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$"
     )
-    date_format = "%b %d %H:%M:%S"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%b %d %H:%M:%S")
     date_locale = "fr_FR.UTF-8"
 
 
@@ -171,7 +184,7 @@ class SysLogLogType(LogType):
     regex = re.compile(
         r"^(?P<date>[^ ]* +\d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<content>.*)$"
     )
-    date_format = "%b %d %H:%M:%S"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%b %d %H:%M:%S")
 
 
 class ZazuSocLogType(LogType):
@@ -183,7 +196,7 @@ class ZazuSocLogType(LogType):
         '[I 2025-10-14 09:53:34] None                 b"I DISPMAN     (display-focus-m)                : DisplayFocusInterface::recvMessage: received register request for session\r"'
     ]
     regex = re.compile(r"^\[I (?P<date>\d+-\d+-\d+ \d+:\d+:\d+)\] None\s+b['\"](?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>.*)\)\s*: ?(?P<content>.*)$")
-    date_format = "%Y-%m-%d %H:%M:%S"
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%Y-%m-%d %H:%M:%S")
 
 
 class PctsLogTypes(LogType):
@@ -294,7 +307,7 @@ def get_log_config_from_arg(log_type_name, input_files):
 def test_log_type_for_examples(log_type):
     print("test_log_type_for_examples:", log_type.name)
     log_re = log_type.regex
-    date_format = log_type.date_format
+    date_obj_from_str, str_from_date_obj = log_type.date_obj_from_str, log_type.str_from_date_obj
     local = log_type.date_locale
     # Save original locale
     prev_locale = locale.setlocale(locale.LC_ALL)
@@ -306,9 +319,9 @@ def test_log_type_for_examples(log_type):
         assert m
         match_dict = m.groupdict()
         date_str = match_dict.get("date")
-        if date_format is not None:
-            date_obj = datetime.datetime.strptime(date_str, date_format)
-            date_str2 = date_obj.strftime(date_format)
+        if date_obj_from_str is not None:
+            date_obj = date_obj_from_str(date_str)
+            date_str2 = str_from_date_obj(date_obj)
             # if date_str != date_str2:
             #     print(date_str, "!=", date_str2)
     # Restore original locale
