@@ -18,6 +18,17 @@ def get_date_methods_from_format(date_format):
     return lambda s: get_date_from_str_and_format(s, date_format), lambda d: get_str_from_date_and_format(d, date_format)
 
 
+def get_date_from_posix_ts(string, ratio):
+    return datetime.datetime.fromtimestamp(float(string) / ratio)
+
+
+def get_posix_ts_from_date(date_obj, ratio):
+    return str(date_obj.timestamp() * ratio)
+
+
+def get_date_methods_from_posix(ratio = 1.0):
+    return lambda s: get_date_from_posix_ts(s, ratio), lambda d: get_posix_ts_from_date(d, ratio)
+
 class LogType:
     """Generic class for log types."""
 
@@ -102,6 +113,7 @@ class DmesgDefaultLogType(LogType):
         "[    0.779734][  T168] cutils-trace: Error opening trace file: No such file or directory (2)",
     ]
     regex = DMESG_RE
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix()
 
 
 class DmesgHumanTimestampsLogType(LogType):
@@ -131,6 +143,7 @@ class DmesgRawLogType(LogType):
         "<4>[15779.293768] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=192.168.1.30",
     ]
     regex = DMESG_RE
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix()
 
 
 class JenkinsLogType(LogType):
@@ -209,6 +222,7 @@ class PctsLogTypes(LogType):
         '42635 D/ Mapping channel 0 to service 1',
     ]
     regex = re.compile(r"^(?P<date>\d+) (?P<level>.)/ (?P<content>.*)$")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix(1000.)
 
 
 class RawLogType(LogType):
@@ -322,8 +336,8 @@ def test_log_type_for_examples(log_type):
         if date_obj_from_str is not None:
             date_obj = date_obj_from_str(date_str)
             date_str2 = str_from_date_obj(date_obj)
-            # if date_str != date_str2:
-            #     print(date_str, "!=", date_str2)
+            if 0 and date_str != date_str2:
+                print(date_str, "!=", date_str2)
     # Restore original locale
     if local != prev_locale:
         locale.setlocale(locale.LC_ALL, prev_locale)
