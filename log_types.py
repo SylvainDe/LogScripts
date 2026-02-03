@@ -186,6 +186,18 @@ class ZazuSocLogType(LogType):
     date_format = "%Y-%m-%d %H:%M:%S"
 
 
+class PctsLogTypes(LogType):
+    "Handle logs from PCTS reports."""
+
+    name = "pcts"
+    examples = [
+        '42555 I/ Successfully connected.',
+        '42563 I/ Start car connection',
+        '42635 D/ Mapping channel 0 to service 1',
+    ]
+    regex = re.compile(r"^(?P<date>\d+) (?P<level>.)/ (?P<content>.*)$")
+
+
 class RawLogType(LogType):
     """Handle logs in the xxx format."""
 
@@ -219,6 +231,7 @@ LOG_TYPES = [
     JournalCtlLogType,
     SysLogLogType,
     ZazuSocLogType,
+    PctsLogTypes,
     RawLogType,
 ]
 

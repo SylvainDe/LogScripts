@@ -22,6 +22,7 @@ from log_types import (
     JournalCtlLogType,
     SysLogLogType,
     ZazuSocLogType,
+    PctsLogTypes,
 )
 
 
@@ -36,6 +37,7 @@ DmesgRawLogType.key_format = "NO KEY DEFINED"
 JenkinsLogType.key_format = "{processid}"
 JournalCtlLogType.key_format = "{processid}"
 SysLogLogType.key_format = "NO KEY DEFINED"
+PctsLogTypes.key_format = "NO KEY DEFINED"
 
 
 def process_file(input_file, log_type):

@@ -29,6 +29,7 @@ from log_types import (
     SysLogLogType,
     RawLogType,
     ZazuSocLogType,
+    PctsLogTypes,
 )
 
 
@@ -47,6 +48,7 @@ JournalCtlLogType.output_format = (
     "DATE {hostname} {processname} {processid} {clean_content}"
 )
 SysLogLogType.output_format = "DATE {hostname} {processname} {clean_content}"
+PctsLogTypes.output_format = "DATE {level} {clean_content}"
 RawLogType.output_format = "{clean_content}"
 
 grouped_values = {
