@@ -40,31 +40,47 @@ def get_ms(td, delta):
     return int((td + delta) / datetime.timedelta(milliseconds=1))
 
 
+def get_diff_from_abs_time(timed_lines, abs_time):
+    for d, line in timed_lines:
+        diff = d - abs_time
+        yield diff, line
+
+
+def get_diff_from_rel_time(timed_lines, re_ref):
+    prev_d = None
+    for d, line in timed_lines:
+        diff = None if prev_d is None else (d - prev_d)
+        if re.search(re_ref, line):
+            prev_d = d
+        yield diff, line
+
+
 def process_file(input_file, log_type, ref_type, reference, delta, output_format):
     log_re, date_format = log_type.regex, log_type.date_format
     timed_lines = list(get_timed_lines(input_file, log_re, date_format))
+    do_reverse = ref_type in ("last", "next")
+    if do_reverse:
+        timed_lines = list(reversed(timed_lines))
     abs_time = None
     if ref_type == "absolute":
         abs_time = datetime.datetime.strptime(reference, date_format)
+        lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
     elif ref_type in ("first", "last"):
         reference_compiled = re.compile(reference)
         matches = [d for d, line in timed_lines if re.search(reference_compiled, line)]
         if not matches:
             print("No match for", reference, "in the", len(timed_lines), "lines")
             return
-        abs_time = matches[0 if ref_type == "first" else -1]
-    else:
-        assert ref_type == "prev"
+        abs_time = matches[0]
+        lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
+    elif ref_type in ("prev", "next"):
         reference_compiled = re.compile(reference)
-
-    prev_d = None
-    for d, line in timed_lines:
-        if abs_time is not None:
-            diff = d - abs_time
-        else:
-            diff = None if prev_d is None else (d - prev_d)
-            if re.search(reference_compiled, line):
-                prev_d = d
+        lines_with_diff = list(get_diff_from_rel_time(timed_lines, reference_compiled))
+    else:
+        assert False
+    if do_reverse:
+        lines_with_diff = reversed(lines_with_diff)
+    for diff, line in lines_with_diff:
         print(output_format.format(get_ms(diff, delta), line))
 
 
@@ -81,13 +97,14 @@ if __name__ == "__main__":
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
         "-ref-type",
-        choices=["absolute", "first", "last", "prev"],
+        choices=["absolute", "first", "last", "prev", "next"],
         default="first",
         help="""Type of time reference:
  - absolute: use time provided (should match input file date format)
  - first: use time from the first line matching the reference param
  - last: use time from the last line matching the reference param
- - prev: use time from the prev line matching the reference param""",
+ - prev: use time from the prev line matching the reference param
+ - next: use time from the next line matching the reference param""",
     )
     parser.add_argument("-reference", default="", help="Reference")
     parser.add_argument(
