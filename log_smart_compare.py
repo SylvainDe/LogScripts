@@ -21,6 +21,7 @@ from log_types import (
     UlogcatLongLogType,
     UlogcatShortLogType,
     LogcatLogType,
+    LogcatFromPctsFileLogType,
     DmesgDefaultLogType,
     DmesgHumanTimestampsLogType,
     DmesgRawLogType,
@@ -39,6 +40,7 @@ UlogcatLongLogType.output_format = (
 )
 UlogcatShortLogType.output_format = "{level} {tag} ({processname}): {clean_content}"
 LogcatLogType.output_format = "DATE PID TID {level} {tag} {clean_content}"
+LogcatFromPctsFileLogType.output_format = "DATE {level} {tag} {clean_content}"
 ZazuSocLogType.output_format = "DATE {level} {tag} ({processname}): {clean_content}"
 DmesgDefaultLogType.output_format = "DATE {processid} {clean_content}"
 DmesgHumanTimestampsLogType.output_format = "DATE {processid} {clean_content}"

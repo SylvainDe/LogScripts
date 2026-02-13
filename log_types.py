@@ -91,6 +91,23 @@ class LogcatLogType(LogType):
     date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
 
 
+class LogcatFromPctsFileLogType(LogType):
+    """Handle logs of types logcat in PCTS file."""
+
+    name = "logcatpcts"
+    examples = [
+        "02-09 13:45:56.544 D/BluetoothHeadset(22220): Proxy object connected",
+        "02-09 13:45:56.544 D/BluetoothA2dp(22220): Proxy object connected",
+        "02-09 13:45:56.549 I/PCTS.LOG(22220): Service disconnected on profile 1.",
+    ]
+
+    regex = re.compile(
+        r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<level>.)\/(?P<tag>[^:]*):(?P<content>.*)$"
+    )
+
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+
+
 # Regexp for a dmesg line
 DMESG_RE = re.compile(
     r"^(<\d+>)?\[(?P<date>[^]]+)\](?P<tid>\[[^]]+\])? (?P<processid>[^:]*:)?(?P<content>.*)$"
@@ -251,6 +268,7 @@ LOG_TYPES = [
     UlogcatLongLogType,
     UlogcatShortLogType,
     LogcatLogType,
+    LogcatFromPctsFileLogType,
     DmesgDefaultLogType,
     DmesgHumanTimestampsLogType,
     DmesgRawLogType,
@@ -330,7 +348,7 @@ def test_log_type_for_examples(log_type):
         locale.setlocale(locale.LC_ALL, local)
     for s in log_type.examples:
         m = re.match(log_re, s)
-        assert m
+        assert m, "String \"{}\" does not match regexp for {}".format(s, log_type.name)
         match_dict = m.groupdict()
         date_str = match_dict.get("date")
         if date_obj_from_str is not None:
