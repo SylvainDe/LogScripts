@@ -99,10 +99,11 @@ class LogcatFromPctsFileLogType(LogType):
         "02-09 13:45:56.544 D/BluetoothHeadset(22220): Proxy object connected",
         "02-09 13:45:56.544 D/BluetoothA2dp(22220): Proxy object connected",
         "02-09 13:45:56.549 I/PCTS.LOG(22220): Service disconnected on profile 1.",
+		"02-25 10:08:55.538 D/BluetoothHeadset( 4307): Binding service...",
     ]
 
     regex = re.compile(
-        r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<level>.)\/(?P<tag>[^:]*):(?P<content>.*)$"
+        r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<level>.)\/(?P<tag>[^:]*)\(\s*(?P<threadid>\d+)\):(?P<content>.*)$"
     )
 
     date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
