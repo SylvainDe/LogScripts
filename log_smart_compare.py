@@ -80,6 +80,8 @@ def clean_content(s):
     s = re.sub("([UPup]id): *\d+", "\\1 <\\1>", s)
     # Replace uid/pid (like "uid/pid 1000/1604")
     s = re.sub("(uid/pid) \d+/\d+", "\\1 <\\1>", s)
+    # Replace id (like "d0150632-e41e-4230-91c6-14a50090c6ff")
+    s = re.sub("{0}{{8}}-{0}{{4}}-{0}{{4}}-{0}{{4}}-{0}{{12}}".format(hex_low_case), "<id>", s)
     # Replace date (like "2008-01-01 12:27:32.963591 AM")
     s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
     # Replace duration (like "0.07ms")
