@@ -73,6 +73,23 @@ class UlogcatShortLogType(LogType):
     )
 
 
+class MergedLogType(LogType):
+    """Handle log containing both kernel logs and ulogcat logs."""
+
+
+    name = "merged_logs"
+    examples = [
+        "K 01-01 00:00:00.000 N KERNEL                                       : Virtual kernel memory layout:",
+        "U 01-01 00:08:07.950 I DOCTOR_HOUSE(doctor-house-47)                : Heartbeat: sent",
+    ]
+
+    regex = re.compile(
+        r"^(?P<logtype>.) (?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d) (?P<level>.) (?P<content>.*)$"
+    )
+
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+
+
 class LogcatLogType(LogType):
     """Handle logs from command 'logcat'."""
 
@@ -99,7 +116,7 @@ class LogcatFromPctsFileLogType(LogType):
         "02-09 13:45:56.544 D/BluetoothHeadset(22220): Proxy object connected",
         "02-09 13:45:56.544 D/BluetoothA2dp(22220): Proxy object connected",
         "02-09 13:45:56.549 I/PCTS.LOG(22220): Service disconnected on profile 1.",
-		"02-25 10:08:55.538 D/BluetoothHeadset( 4307): Binding service...",
+        "02-25 10:08:55.538 D/BluetoothHeadset( 4307): Binding service...",
     ]
 
     regex = re.compile(
@@ -268,6 +285,7 @@ class XxxLogType(LogType):
 LOG_TYPES = [
     UlogcatLongLogType,
     UlogcatShortLogType,
+    MergedLogType,
     LogcatLogType,
     LogcatFromPctsFileLogType,
     DmesgDefaultLogType,
