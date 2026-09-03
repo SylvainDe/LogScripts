@@ -34,10 +34,29 @@ def get_timed_lines(input_file, log_re, date_obj_from_str):
         print(log)
 
 
-def get_ms(td, delta):
-    if td is None:
+UNITS = {
+    "ms": datetime.timedelta(milliseconds=1),
+    "s": datetime.timedelta(seconds=1),
+    "us": datetime.timedelta(microseconds=1),
+    "μs": datetime.timedelta(microseconds=1),
+}
+
+
+def get_formatted_delta(diff, delta_format):
+    if diff is None:
         return ""
-    return int((td + delta) / datetime.timedelta(milliseconds=1))
+    # Handle formatting based on unit
+    if delta_format in UNITS:
+        return str(int(diff / UNITS[delta_format])) + " " + delta_format
+    # Handle formatting based on strftime
+    us = int(diff / datetime.timedelta(microseconds=1))
+    sign = "-" if us < 0 else ""
+    s, us = divmod(abs(us), 1000000)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    d, h = divmod(h, 24)
+    time = datetime.time(h, m, s, us)
+    return sign + time.strftime(delta_format)
 
 
 def get_diff_from_abs_time(timed_lines, abs_time):
@@ -55,7 +74,9 @@ def get_diff_from_rel_time(timed_lines, re_ref):
         yield diff, line
 
 
-def process_file(input_file, log_type, ref_type, reference, delta, output_format):
+def process_file(
+    input_file, log_type, ref_type, reference, delta, output_format, delta_format
+):
     log_re, date_obj_from_str = log_type.regex, log_type.date_obj_from_str
     timed_lines = list(get_timed_lines(input_file, log_re, date_obj_from_str))
     do_reverse = ref_type in ("last", "next")
@@ -81,7 +102,9 @@ def process_file(input_file, log_type, ref_type, reference, delta, output_format
     if do_reverse:
         lines_with_diff = reversed(lines_with_diff)
     for diff, line in lines_with_diff:
-        print(output_format.format(get_ms(diff, delta), line))
+        if diff is not None:
+            diff += delta
+        print(output_format.format(get_formatted_delta(diff, delta_format), line))
 
 
 if __name__ == "__main__":
@@ -113,7 +136,15 @@ if __name__ == "__main__":
         help="Delta (in ms) which is assigned to reference",
         type=int,
     )
-    output_format = "[{0:>8} ms] {1}"
+    delta_format = "%M:%S:%f"
+    parser.add_argument(
+        "-deltaformat",
+        default=delta_format,
+        help='Format used for the delta value. A unit can be provided (). Otherwise, the value is interpreted as a date format (provided to strftime). Defaults to "{0}"'.format(
+            delta_format
+        ),
+    )
+    output_format = "[{0:>11}] {1}"
     parser.add_argument(
         "-outputformat",
         default=output_format,
@@ -129,5 +160,11 @@ if __name__ == "__main__":
     log_type = get_log_config_from_arg(args.format, [input_file])
     delta = datetime.timedelta(milliseconds=args.delta)
     process_file(
-        input_file, log_type, args.ref_type, args.reference, delta, args.outputformat
+        input_file,
+        log_type,
+        args.ref_type,
+        args.reference,
+        delta,
+        args.outputformat,
+        args.deltaformat,
     )
