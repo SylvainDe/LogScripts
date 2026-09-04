@@ -35,8 +35,12 @@ def get_timed_lines(input_file, log_re, date_obj_from_str):
 
 
 UNITS = {
-    "ms": datetime.timedelta(milliseconds=1),
+    "w": datetime.timedelta(weeks=1),
+    "d": datetime.timedelta(days=1),
+    "h": datetime.timedelta(hours=1),
+    "m": datetime.timedelta(minutes=1),
     "s": datetime.timedelta(seconds=1),
+    "ms": datetime.timedelta(milliseconds=1),
     "us": datetime.timedelta(microseconds=1),
     "μs": datetime.timedelta(microseconds=1),
 }
@@ -47,7 +51,8 @@ def get_formatted_delta(diff, delta_format):
         return ""
     # Handle formatting based on unit
     if delta_format in UNITS:
-        return str(int(diff / UNITS[delta_format])) + " " + delta_format
+        f = "{0: 12.2f} {1}"  # or "{0:g}" or "{0:f}" - to make configurable?
+        return f.format(diff / UNITS[delta_format], delta_format)
     # Handle formatting based on strftime
     us = int(diff / datetime.timedelta(microseconds=1))
     sign = "-" if us < 0 else ""
@@ -140,17 +145,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "-deltaformat",
         default=delta_format,
-        help='Format used for the delta value. A unit can be provided (). Otherwise, the value is interpreted as a date format (provided to strftime). Defaults to "{0}"'.format(
-            delta_format
+        help="Format used for the delta value. A unit can be provided ({0}). Otherwise, the value is interpreted as a date format (provided to strftime). Defaults to %(default)s".format(
+            ", ".join(UNITS)
         ),
     )
-    output_format = "[{0:>11}] {1}"
+    output_format = "[{0}] {1}"
+    # Examples: "[{0:.9}] {1}" (for truncation), "[{0:>15}] {1}" (for padding)
     parser.add_argument(
         "-outputformat",
         default=output_format,
-        help='Output format ({{0}} is the delta time and {{1}} is the original log line). Defaults to "{0}"'.format(
-            output_format
-        ),
+        help='Output format ({0} is the delta time and {1} is the original log line). Defaults to "%(default)s"',
     )
 
     # Get arguments
