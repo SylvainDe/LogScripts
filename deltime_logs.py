@@ -10,7 +10,8 @@ from log_types import (
 )
 
 
-def get_timed_lines(input_file, log_re, date_obj_from_str):
+def get_timed_lines(input_file, log_type):
+    log_re, date_obj_from_str = log_type.regex, log_type.date_obj_from_str
     no_match = list()
     lines = list(input_file)
     for line in lines:
@@ -79,11 +80,8 @@ def get_diff_from_rel_time(timed_lines, re_ref):
         yield diff, line
 
 
-def process_file(
-    input_file, log_type, ref_type, reference, delta, output_format, delta_format
-):
-    log_re, date_obj_from_str = log_type.regex, log_type.date_obj_from_str
-    timed_lines = list(get_timed_lines(input_file, log_re, date_obj_from_str))
+def get_lines_with_diff(input_file, log_type, ref_type, reference):
+    timed_lines = list(get_timed_lines(input_file, log_type))
     do_reverse = ref_type in ("last", "next")
     if do_reverse:
         timed_lines = list(reversed(timed_lines))
@@ -96,7 +94,7 @@ def process_file(
         matches = [d for d, line in timed_lines if re.search(reference_compiled, line)]
         if not matches:
             print("No match for", reference, "in the", len(timed_lines), "lines")
-            return
+            return []
         abs_time = matches[0]
         lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
     elif ref_type in ("prev", "next"):
@@ -106,7 +104,13 @@ def process_file(
         assert False
     if do_reverse:
         lines_with_diff = reversed(lines_with_diff)
-    for diff, line in lines_with_diff:
+    return lines_with_diff
+
+
+def process_file(
+    input_file, log_type, ref_type, reference, delta, output_format, delta_format
+):
+    for diff, line in get_lines_with_diff(input_file, log_type, ref_type, reference):
         if diff is not None:
             diff += delta
         print(output_format.format(get_formatted_delta(diff, delta_format), line))
