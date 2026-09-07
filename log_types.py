@@ -316,7 +316,7 @@ assert AUTOMATIC_OPTION not in LOG_CONFIGS
 LOG_CONFIG_ARG = {
     "choices": LOG_CONFIGS.keys() | set([AUTOMATIC_OPTION]),
     "default": AUTOMATIC_OPTION,
-    "help": "Log format",
+    "help": "Log format. Defaults to %(default)s",
 }
 
 

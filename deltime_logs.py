@@ -132,13 +132,14 @@ if __name__ == "__main__":
  - first: use time from the first line matching the reference param
  - last: use time from the last line matching the reference param
  - prev: use time from the prev line matching the reference param
- - next: use time from the next line matching the reference param""",
+ - next: use time from the next line matching the reference param.
+ Defaults to $(default)s""",
     )
     parser.add_argument("-reference", default="", help="Reference")
     parser.add_argument(
         "-delta",
         default=0,
-        help="Delta (in ms) which is assigned to reference",
+        help="Delta (in ms) which is assigned to reference. Default to %(default)s",
         type=int,
     )
     delta_format = "%M:%S:%f"

@@ -205,7 +205,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
-        "-difftool", default="meld", help="Diff tool such as meld or kompare"
+        "-difftool", default="meld", help="Diff tool such as meld or kompare. Defaults to %(default)s"
     )
     default_group_keys = [
         "tag",
