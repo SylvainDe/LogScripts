@@ -34,24 +34,22 @@ from log_types import (
 )
 
 
-# Add information about the output format to the log types
-UlogcatLongLogType.output_format = (
-    "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}"
-)
-UlogcatShortLogType.output_format = "{level} {tag} ({processname}): {clean_content}"
-LogcatLogType.output_format = "DATE PID TID {level} {tag} {clean_content}"
-LogcatFromPctsFileLogType.output_format = "DATE {level} {tag} TID {clean_content}"
-ZazuSocLogType.output_format = "DATE {level} {tag} ({processname}): {clean_content}"
-DmesgDefaultLogType.output_format = "DATE {processid} {clean_content}"
-DmesgHumanTimestampsLogType.output_format = "DATE {processid} {clean_content}"
-DmesgRawLogType.output_format = "DATE {processid} {clean_content}"
-JenkinsLogType.output_format = "DATE {content}"
-JournalCtlLogType.output_format = (
-    "DATE {hostname} {processname} {processid} {clean_content}"
-)
-SysLogLogType.output_format = "DATE {hostname} {processname} {clean_content}"
-PctsLogTypes.output_format = "DATE {level} {clean_content}"
-RawLogType.output_format = "{clean_content}"
+# Information about the output format to the log types
+OUTPUT_FORMATS = {
+    UlogcatLongLogType: "DATE {level} {tag} ({processname}-PID/{threadname}-TID): {clean_content}",
+    UlogcatShortLogType: "{level} {tag} ({processname}): {clean_content}",
+    LogcatLogType: "DATE PID TID {level} {tag} {clean_content}",
+    LogcatFromPctsFileLogType: "DATE {level} {tag} TID {clean_content}",
+    ZazuSocLogType: "DATE {level} {tag} ({processname}): {clean_content}",
+    DmesgDefaultLogType: "DATE {processid} {clean_content}",
+    DmesgHumanTimestampsLogType: "DATE {processid} {clean_content}",
+    DmesgRawLogType: "DATE {processid} {clean_content}",
+    JenkinsLogType: "DATE {content}",
+    JournalCtlLogType: "DATE {hostname} {processname} {processid} {clean_content}",
+    SysLogLogType: "DATE {hostname} {processname} {clean_content}",
+    PctsLogTypes: "DATE {level} {clean_content}",
+    RawLogType: "{clean_content}",
+}
 
 grouped_values = {
     "processthreadnames": ("processname", "threadname"),
@@ -109,10 +107,8 @@ patterns["ALL"] = "|".join(pat_re for pat_re in patterns)
 patterns = {k: re.compile(v, re.IGNORECASE) for k, v in patterns.items()}
 
 
-def extract_data(f, log_type):
+def extract_data(f, log_re, out_format):
     """Extract relevant data from file - return a dictionnary."""
-    log_re = re.compile(log_type.regex)
-    out_format = log_type.output_format
     bigdict = dict()
     dict_all = bigdict.setdefault("ALL", dict())
     clean_lst = dict_all.setdefault("clean", [])
@@ -164,7 +160,7 @@ def extract_data(f, log_type):
 def store_relevant_data_in_a_tmp_folder(f, log_type, group_keys):
     """Store relevant data from file provided into a tmp folder."""
     # Extract relevant data from file
-    bigdict = extract_data(f, log_type)
+    bigdict = extract_data(f, log_type.regex, OUTPUT_FORMATS[log_type])
     # Store data in multiple files in a temporary folder
     tmpdir = tempfile.mkdtemp()
     print("%s analysed in %s" % (f.name, tmpdir))

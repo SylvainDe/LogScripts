@@ -26,23 +26,23 @@ from log_types import (
 )
 
 
-# Add information about the key format to the log types
-UlogcatLongLogType.key_format = "{processid}/{threadid}"
-UlogcatShortLogType.key_format = "{processid}"
-ZazuSocLogType.key_format = "{processname}"
-LogcatLogType.key_format = "{processid}/{threadid}"
-DmesgDefaultLogType.key_format = "NO KEY DEFINED"
-DmesgHumanTimestampsLogType.key_format = "NO KEY DEFINED"
-DmesgRawLogType.key_format = "NO KEY DEFINED"
-JenkinsLogType.key_format = "{processid}"
-JournalCtlLogType.key_format = "{processid}"
-SysLogLogType.key_format = "NO KEY DEFINED"
-PctsLogTypes.key_format = "NO KEY DEFINED"
+# Information about the key format to the log types
+KEY_FORMATS = {
+    UlogcatLongLogType: "{processid}/{threadid}",
+    UlogcatShortLogType: "{processid}",
+    ZazuSocLogType: "{processname}",
+    LogcatLogType: "{processid}/{threadid}",
+    DmesgDefaultLogType: "NO KEY DEFINED",
+    DmesgHumanTimestampsLogType: "NO KEY DEFINED",
+    DmesgRawLogType: "NO KEY DEFINED",
+    JenkinsLogType: "{processid}",
+    JournalCtlLogType: "{processid}",
+    SysLogLogType: "NO KEY DEFINED",
+    PctsLogTypes: "NO KEY DEFINED",
+}
 
 
-def process_file(input_file, log_type):
-    log_re = log_type.regex
-    key_format = log_type.key_format
+def process_file(input_file, log_re, key_format):
     no_match = list()
     lines_by_key = dict()
     lines = list(input_file)
@@ -93,4 +93,4 @@ if __name__ == "__main__":
     log_type = get_log_config_from_arg(args.format, [input_file])
 
     # Do process
-    process_file(input_file, log_type)
+    process_file(input_file, log_type.regex, KEY_FORMATS[log_type])
