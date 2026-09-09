@@ -32,13 +32,8 @@ KEY_FORMATS = {
     UlogcatShortLogType: "{processid}",
     ZazuSocLogType: "{processname}",
     LogcatLogType: "{processid}/{threadid}",
-    DmesgDefaultLogType: "NO KEY DEFINED",
-    DmesgHumanTimestampsLogType: "NO KEY DEFINED",
-    DmesgRawLogType: "NO KEY DEFINED",
     JenkinsLogType: "{processid}",
     JournalCtlLogType: "{processid}",
-    SysLogLogType: "NO KEY DEFINED",
-    PctsLogTypes: "NO KEY DEFINED",
 }
 
 
@@ -93,4 +88,4 @@ if __name__ == "__main__":
     log_type = get_log_config_from_arg(args.format, [input_file])
 
     # Do process
-    process_file(input_file, log_type.regex, KEY_FORMATS[log_type])
+    process_file(input_file, log_type.regex, KEY_FORMATS.get(log_type, 'NO KEY DEFINED'))

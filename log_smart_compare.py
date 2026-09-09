@@ -123,6 +123,7 @@ def extract_data(f, log_re, out_format):
                 no_match.append(line)
             else:
                 d = m.groupdict()
+                d['original'] = line
                 for field, (func, clean_field) in cleanup_functions.items():
                     val = d.get(field)
                     if val is not None:
@@ -160,7 +161,7 @@ def extract_data(f, log_re, out_format):
 def store_relevant_data_in_a_tmp_folder(f, log_type, group_keys):
     """Store relevant data from file provided into a tmp folder."""
     # Extract relevant data from file
-    bigdict = extract_data(f, log_type.regex, OUTPUT_FORMATS[log_type])
+    bigdict = extract_data(f, log_type.regex, OUTPUT_FORMATS.get(log_type, '{original}'))
     # Store data in multiple files in a temporary folder
     tmpdir = tempfile.mkdtemp()
     print("%s analysed in %s" % (f.name, tmpdir))
