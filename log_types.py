@@ -15,7 +15,9 @@ def get_str_from_date_and_format(date_obj, date_format):
 
 
 def get_date_methods_from_format(date_format):
-    return lambda s: get_date_from_str_and_format(s, date_format), lambda d: get_str_from_date_and_format(d, date_format)
+    return lambda s: get_date_from_str_and_format(
+        s, date_format
+    ), lambda d: get_str_from_date_and_format(d, date_format)
 
 
 def get_date_from_posix_ts(string, ratio):
@@ -26,8 +28,11 @@ def get_posix_ts_from_date(date_obj, ratio):
     return str(date_obj.timestamp() * ratio)
 
 
-def get_date_methods_from_posix(ratio = 1.0):
-    return lambda s: get_date_from_posix_ts(s, ratio), lambda d: get_posix_ts_from_date(d, ratio)
+def get_date_methods_from_posix(ratio=1.0):
+    return lambda s: get_date_from_posix_ts(s, ratio), lambda d: get_posix_ts_from_date(
+        d, ratio
+    )
+
 
 class LogType:
     """Generic class for log types."""
@@ -56,7 +61,9 @@ class UlogcatLongLogType(LogType):
         r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d) (?P<level>.) (?P<tag>[^( ]*)\s*\((?:(?P<processname>.*)-(?P<processid>.*)\/)?(?P<threadname>[^\/]*)-(?P<threadid>\d+)\)\s*: ?(?P<content>.*)$"
     )
 
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%m-%d %H:%M:%S.%f"
+    )
 
 
 class UlogcatShortLogType(LogType):
@@ -76,7 +83,6 @@ class UlogcatShortLogType(LogType):
 class MergedLogType(LogType):
     """Handle log containing both kernel logs and ulogcat logs."""
 
-
     name = "merged_logs"
     examples = [
         "K 01-01 00:00:00.000 N KERNEL                                       : Virtual kernel memory layout:",
@@ -87,7 +93,9 @@ class MergedLogType(LogType):
         r"^(?P<logtype>.) (?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d) (?P<level>.) (?P<content>.*)$"
     )
 
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%m-%d %H:%M:%S.%f"
+    )
 
 
 class LogcatLogType(LogType):
@@ -105,7 +113,9 @@ class LogcatLogType(LogType):
         r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<processid>\d+)\s+(?P<threadid>\d+)\s+(?P<level>.)\s+(?P<tag>[^:]*):(?P<content>.*)$"
     )
 
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%m-%d %H:%M:%S.%f"
+    )
 
 
 class LogcatFromPctsFileLogType(LogType):
@@ -123,7 +133,9 @@ class LogcatFromPctsFileLogType(LogType):
         r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<level>.)\/(?P<tag>[^:]*)\(\s*(?P<threadid>\d+)\):(?P<content>.*)$"
     )
 
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%m-%d %H:%M:%S.%f")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%m-%d %H:%M:%S.%f"
+    )
 
 
 # Regexp for a dmesg line
@@ -162,7 +174,9 @@ class DmesgHumanTimestampsLogType(LogType):
         #        "[jeu. nov.  7 13:16:43 2024] [UFW BLOCK] IN=wlp0s20f3 OUT= MAC=f4:4e:e3:a8:63:1c:bc:05:df:df:3d:dd:08:00 SRC=19",
     ]
     regex = DMESG_RE
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%a %b %d %H:%M:%S %Y")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%a %b %d %H:%M:%S %Y"
+    )
 
 
 class DmesgRawLogType(LogType):
@@ -194,7 +208,9 @@ class JenkinsLogType(LogType):
         r"^\[(?P<date>[0-9TZ:.-]*)\](?P<progress> \[\s*\d+% \d+/\d+])? ?(?P<content>.*)$"
     )
 
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%Y-%m-%dT%H:%M:%S.%fZ")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    )
 
 
 class JournalCtlLogType(LogType):
@@ -212,7 +228,9 @@ class JournalCtlLogType(LogType):
     regex = re.compile(
         r"^(?P<date>.* \d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<processname>.*)\[(?P<processid>\d+)]: (?P<content>.*)$"
     )
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%b %d %H:%M:%S")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%b %d %H:%M:%S"
+    )
     date_locale = "fr_FR.UTF-8"
 
 
@@ -232,7 +250,9 @@ class SysLogLogType(LogType):
     regex = re.compile(
         r"^(?P<date>[^ ]* +\d+ \d+:\d+:\d+) (?P<hostname>.*) (?P<content>.*)$"
     )
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%b %d %H:%M:%S")
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%b %d %H:%M:%S"
+    )
 
 
 class ZazuSocLogType(LogType):
@@ -241,23 +261,27 @@ class ZazuSocLogType(LogType):
     name = "zazusoc"
     examples = [
         "[I 2025-10-14 09:53:34] None                 b'I DISPMAN     (display-focus-m)                : onConnected: a new display session is connected\r'",
-        '[I 2025-10-14 09:53:34] None                 b"I DISPMAN     (display-focus-m)                : DisplayFocusInterface::recvMessage: received register request for session\r"'
+        '[I 2025-10-14 09:53:34] None                 b"I DISPMAN     (display-focus-m)                : DisplayFocusInterface::recvMessage: received register request for session\r"',
     ]
-    regex = re.compile(r"^\[I (?P<date>\d+-\d+-\d+ \d+:\d+:\d+)\] None\s+b['\"](?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>.*)\)\s*: ?(?P<content>.*)$")
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_format("%Y-%m-%d %H:%M:%S")
+    regex = re.compile(
+        r"^\[I (?P<date>\d+-\d+-\d+ \d+:\d+:\d+)\] None\s+b['\"](?P<level>.) (?P<tag>[^( ]*)\s*\((?P<processname>.*)\)\s*: ?(?P<content>.*)$"
+    )
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_format(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
 
 class PctsLogTypes(LogType):
-    "Handle logs from PCTS reports."""
+    """Handle logs from PCTS reports."""
 
     name = "pcts"
     examples = [
-        '42555 I/ Successfully connected.',
-        '42563 I/ Start car connection',
-        '42635 D/ Mapping channel 0 to service 1',
+        "42555 I/ Successfully connected.",
+        "42563 I/ Start car connection",
+        "42635 D/ Mapping channel 0 to service 1",
     ]
     regex = re.compile(r"^(?P<date>\d+) (?P<level>.)/ (?P<content>.*)$")
-    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix(1000.)
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix(1000.0)
 
 
 class RawLogType(LogType):
@@ -358,7 +382,10 @@ def get_log_config_from_arg(log_type_name, input_files):
 def test_log_type_for_examples(log_type):
     print("test_log_type_for_examples:", log_type.name)
     log_re = log_type.regex
-    date_obj_from_str, str_from_date_obj = log_type.date_obj_from_str, log_type.str_from_date_obj
+    date_obj_from_str, str_from_date_obj = (
+        log_type.date_obj_from_str,
+        log_type.str_from_date_obj,
+    )
     local = log_type.date_locale
     # Save original locale
     prev_locale = locale.setlocale(locale.LC_ALL)
@@ -367,7 +394,7 @@ def test_log_type_for_examples(log_type):
         locale.setlocale(locale.LC_ALL, local)
     for s in log_type.examples:
         m = re.match(log_re, s)
-        assert m, "String \"{}\" does not match regexp for {}".format(s, log_type.name)
+        assert m, 'String "{}" does not match regexp for {}'.format(s, log_type.name)
         match_dict = m.groupdict()
         date_str = match_dict.get("date")
         if date_obj_from_str is not None:

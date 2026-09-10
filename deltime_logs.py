@@ -2,6 +2,7 @@
 This script is used to compute delta time/time differences between line
 of logs as it can make things easier to understand sometimes.
 """
+
 import re
 import datetime
 from log_types import (

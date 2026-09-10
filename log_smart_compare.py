@@ -79,7 +79,9 @@ def clean_content(s):
     # Replace uid/pid (like "uid/pid 1000/1604")
     s = re.sub("(uid/pid) \d+/\d+", "\\1 <\\1>", s)
     # Replace id (like "d0150632-e41e-4230-91c6-14a50090c6ff")
-    s = re.sub("{0}{{8}}-{0}{{4}}-{0}{{4}}-{0}{{4}}-{0}{{12}}".format(hex_low_case), "<id>", s)
+    s = re.sub(
+        "{0}{{8}}-{0}{{4}}-{0}{{4}}-{0}{{4}}-{0}{{12}}".format(hex_low_case), "<id>", s
+    )
     # Replace date (like "2008-01-01 12:27:32.963591 AM")
     s = re.sub("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d+ [AMP]+", "<date>", s)
     # Replace duration (like "0.07ms")
@@ -123,7 +125,7 @@ def extract_data(f, log_re, out_format):
                 no_match.append(line)
             else:
                 d = m.groupdict()
-                d['original'] = line
+                d["original"] = line
                 for field, (func, clean_field) in cleanup_functions.items():
                     val = d.get(field)
                     if val is not None:
@@ -161,7 +163,9 @@ def extract_data(f, log_re, out_format):
 def store_relevant_data_in_a_tmp_folder(f, log_type, group_keys):
     """Store relevant data from file provided into a tmp folder."""
     # Extract relevant data from file
-    bigdict = extract_data(f, log_type.regex, OUTPUT_FORMATS.get(log_type, '{original}'))
+    bigdict = extract_data(
+        f, log_type.regex, OUTPUT_FORMATS.get(log_type, "{original}")
+    )
     # Store data in multiple files in a temporary folder
     tmpdir = tempfile.mkdtemp()
     print("%s analysed in %s" % (f.name, tmpdir))
@@ -202,7 +206,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("-format", **LOG_CONFIG_ARG)
     parser.add_argument(
-        "-difftool", default="meld", help="Diff tool such as meld or kompare. Defaults to %(default)s"
+        "-difftool",
+        default="meld",
+        help="Diff tool such as meld or kompare. Defaults to %(default)s",
     )
     default_group_keys = [
         "tag",

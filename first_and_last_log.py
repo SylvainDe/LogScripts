@@ -88,4 +88,7 @@ if __name__ == "__main__":
     log_type = get_log_config_from_arg(args.format, [input_file])
 
     # Do process
-    process_file(input_file, log_type.regex, KEY_FORMATS.get(log_type, 'NO KEY DEFINED'))
+    process_file(
+        input_file, log_type.regex, KEY_FORMATS.get(log_type, "NO KEY DEFINED")
+    )
+
