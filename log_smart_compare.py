@@ -1,11 +1,43 @@
 """
-This script is used to compare log files which are usually hard to compare for various reasons:
- - some data should not be compared (timestamps, thread identifiers, etc)
- - irrelevant events in the wrong order mess up with the diff
-Hence, the script tries to get the relevant data and stores them with a clean format in a well defined file hierarchy.
-Then, the output folders can be compared with a proper tool such as meld or kompare.
-"""
+Comparison of log files tend to be complicated for different reasons:
+ 1. some data are different but are not relevant for the comparison. This could
+    be the case for:
+     a. Part of the actual content of the log: identifiers, hashes, etc
+     b. Parts of the "metadata" associated to the log itself: timestamp, process
+        identifier, etc
+ 2. events from different processes/threads may happen in different order and
+    mess up with the diff
+ 3. a vast amount of logs are not relevant
 
+This script tries to makes things easier by generating a well defined hierarchy
+of files which are expected to be easier to compare. In particular:
+ - Issue 1 is handled by:
+     a. Cleaning out parts of the logs - see cleanup_functions for more details
+     b. Removing dates, pid, tid (based on the log regexps) - see OUTPUT_FORMATS
+        for more details
+ - Issue 2 is handled by generating files where data is grouped by key (for
+   example by thread names or process names) so that one can focus on a single
+   entity
+ - Issue 3 is handled by generating files containing only particular
+   pattern(s) - see patterns for more details
+
+
+Note: meld (https://meldmerge.org/) can also handle natively some of these
+issues with a bit a configuration. In particular, issue 1 can be handled with
+Text filters (https://meldmerge.org/help/text-filters.html).
+ - Issue 1.a. is straightforward as this is the whole point of the feature
+ - Issue 1.b. is a bit trickier to handle and relies on the fact that if "the
+expression contains groups, only the groups are replaced". For example, if the
+regexp for the log type is:
+     r"^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<processid>\d+)\s+(?P<threadid>\d+)\s+(?P<level>.)\s+(?P<tag>[^:]*):(?P<content>.*)$"
+and you want to ignore dates, processid and threadid but not level, tag and
+content, you can use "(?:)" for the latter to use non capturing parenthesis,
+leading to:
+     ^(?P<date>\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d)\s+(?P<processid>\d+)\s+(?P<threadid>\d+)\s+(?:.)\s+(?:[^:]*):(?:.*)$
+If you do use configure meld to handle these problems, you can tweak the code in
+cleanup_functions and OUTPUT_FORMATS to keep the original log as much as
+possible.
+"""
 
 import sys
 import re
