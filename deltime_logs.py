@@ -48,6 +48,10 @@ UNITS = {
 }
 
 
+def timedelta_to_microsec(td):
+    return td / datetime.timedelta(microseconds=1)
+
+
 def get_formatted_delta(diff, delta_format):
     if diff is None:
         return ""
@@ -56,7 +60,7 @@ def get_formatted_delta(diff, delta_format):
         f = "{0: 12.2f} {1}"  # or "{0:g}" or "{0:f}" - to make configurable?
         return f.format(diff / UNITS[delta_format], delta_format)
     # Handle formatting based on strftime
-    us = int(diff / datetime.timedelta(microseconds=1))
+    us = int(timedelta_to_microsec(diff))
     sign = "-" if us < 0 else ""
     s, us = divmod(abs(us), 1000000)
     m, s = divmod(s, 60)
@@ -109,12 +113,32 @@ def get_lines_with_diff(input_file, log_type, ref_type, reference):
 
 
 def process_file(
-    input_file, log_type, ref_type, reference, delta, output_format, delta_format
+    input_file,
+    log_type,
+    ref_type,
+    reference,
+    delta,
+    output_format,
+    delta_format,
+    log_for_zero,
 ):
+    prev_diff = None
     for diff, line in get_lines_with_diff(input_file, log_type, ref_type, reference):
         if diff is not None:
             diff += delta
+        if (
+            log_for_zero
+            and diff is not None
+            and prev_diff is not None
+            and timedelta_to_microsec(diff) * timedelta_to_microsec(prev_diff) < 0
+        ):
+            print(
+                output_format.format(
+                    get_formatted_delta(datetime.timedelta(), delta_format), "0" * 100
+                )
+            )
         print(output_format.format(get_formatted_delta(diff, delta_format), line))
+        prev_diff = diff
 
 
 if __name__ == "__main__":
@@ -140,6 +164,19 @@ if __name__ == "__main__":
  - next: use time from the next line matching the reference param.
  Defaults to $(default)s""",
     )
+    parser.add_argument(
+        "--log-for-zero",
+        action="store_true",
+        dest="log_for_zero",
+        help="Add log when relative time crosses the 0 value",
+    )
+    parser.add_argument(
+        "--no-log-for-zero",
+        action="store_false",
+        dest="log_for_zero",
+        help="Do not add log when relative time crosses the 0 value",
+    )
+    parser.set_defaults(log_for_zero=False)
     parser.add_argument("-reference", default="", help="Reference")
     parser.add_argument(
         "-delta",
@@ -177,4 +214,5 @@ if __name__ == "__main__":
         delta,
         args.outputformat,
         args.deltaformat,
+        args.log_for_zero,
     )
