@@ -118,6 +118,23 @@ class LogcatLogType(LogType):
     )
 
 
+class LogcatMonotonicLogType(LogType):
+    """Handle logs from command 'logcat -v monotonic'."""
+
+    name = "logcatmonotonic"
+    examples = [
+        "-1793786406.861   147   147 E cutils-trace: Error opening trace file: No such file or directory (2)",
+        "11.497   256   256 I SystemServer: StartBatteryService",
+        "11.502   256   419 D SystemServerInitThreadPool: Started executing StartSensorService",
+    ]
+
+    regex = re.compile(
+        r"^(?P<date>-?\d+\.\d+)\s+(?P<processid>\d+)\s+(?P<threadid>\d+)\s+(?P<level>.)\s+(?P<tag>[^:]*):(?P<content>.*)$"
+    )
+
+    date_obj_from_str, str_from_date_obj = get_date_methods_from_posix()
+
+
 class LogcatFromPctsFileLogType(LogType):
     """Handle logs of types logcat in PCTS file."""
 
@@ -311,6 +328,7 @@ LOG_TYPES = [
     UlogcatShortLogType,
     MergedLogType,
     LogcatLogType,
+    LogcatMonotonicLogType,
     LogcatFromPctsFileLogType,
     DmesgDefaultLogType,
     DmesgHumanTimestampsLogType,
