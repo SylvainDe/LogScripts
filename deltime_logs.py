@@ -77,11 +77,21 @@ def get_diff_from_abs_time(timed_lines, abs_time):
 
 
 def get_diff_from_rel_time(timed_lines, re_ref):
+    # TODO: make this configurable if relevant
+    use_neg_before_first = False
+    use_zero_for_match = False
     prev_d = None
+    if use_neg_before_first:
+        for d, line in timed_lines:
+            if re.search(re_ref, line):
+                prev_d = d
+                break
     for d, line in timed_lines:
         diff = None if prev_d is None else (d - prev_d)
         if re.search(re_ref, line):
             prev_d = d
+            if use_zero_for_match:
+                diff = datetime.timedelta()
         yield diff, line
 
 
