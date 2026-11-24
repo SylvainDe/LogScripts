@@ -106,11 +106,12 @@ def get_lines_with_diff(input_file, log_type, ref_type, reference):
         lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
     elif ref_type in ("first", "last"):
         reference_compiled = re.compile(reference)
-        matches = [d for d, line in timed_lines if re.search(reference_compiled, line)]
-        if not matches:
+        abs_time = next(
+            (d for d, line in timed_lines if re.search(reference_compiled, line)), None
+        )
+        if not abs_time:
             print("No match for", reference, "in the", len(timed_lines), "lines")
             return []
-        abs_time = matches[0]
         lines_with_diff = list(get_diff_from_abs_time(timed_lines, abs_time))
     elif ref_type in ("prev", "next"):
         reference_compiled = re.compile(reference)
